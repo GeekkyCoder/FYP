@@ -15,14 +15,18 @@ import AppWidgetSummary from '../app-widget-summary';
 import AppTrafficBySite from '../app-traffic-by-site';
 import AppCurrentSubject from '../app-current-subject';
 import AppConversionRates from '../app-conversion-rates';
+import useAuth from 'src/hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
 export default function AppView() {
+
+ const {user} = useAuth()
+
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Hi, Welcome back Faraz👋
+        Hi, Welcome back {user?.userName}
       </Typography>
 
       <Grid container spacing={3}>

@@ -21,11 +21,13 @@ import Scrollbar from 'src/components/scrollbar';
 
 import { NAV } from './config-layout';
 import navConfig from './config-navigation';
+import useAuth from 'src/hooks/useAuth';
 
 // ----------------------------------------------------------------------
 
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = usePathname();
+  const {user} = useAuth()
 
   const upLg = useResponsive('up', 'lg');
 
@@ -36,8 +38,9 @@ export default function Nav({ openNav, onCloseNav }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  const renderAccount = (
-    <Box
+  const RenderAccount = (user) => {
+    return (
+      <Box
       sx={{
         my: 3,
         mx: 2.5,
@@ -49,19 +52,22 @@ export default function Nav({ openNav, onCloseNav }) {
         bgcolor: (theme) => alpha(theme.palette.grey[500], 0.12),
       }}
     >
-      <Avatar src={account.photoURL} alt="photoURL" />
+      <Avatar src={user?.profilePicture} alt="photoURL" />
 
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">{account.displayName}</Typography>
+        <Typography variant="subtitle2">{user?.userName}</Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {account.role}
+          {user?.role}
         </Typography>
       </Box>
     </Box>
-  );
+    )
+  }
+  
 
-  const renderMenu = (
+
+  const RenderMenu = (
     <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
       {navConfig.map((item) => (
         <NavItem key={item.title} item={item} />
@@ -69,28 +75,29 @@ export default function Nav({ openNav, onCloseNav }) {
     </Stack>
   );
 
-  const renderContent = (
-    <Scrollbar
-      sx={{
+  const RenderContent = (user) => {
+    return <Scrollbar
+    sx={{
+      height: 1,
+      '& .simplebar-content': {
         height: 1,
-        '& .simplebar-content': {
-          height: 1,
-          display: 'flex',
-          flexDirection: 'column',
-        },
-      }}
-    >
-      <Logo sx={{ mt: 3, ml: 4 }} />
+        display: 'flex',
+        flexDirection: 'column',
+      },
+    }}
+  >
+    <Logo sx={{ mt: 3, ml: 4 }} />
 
-      {renderAccount}
+    {RenderAccount(user)}
 
-      {renderMenu}
+    {RenderMenu}
 
-      <Box sx={{ flexGrow: 1 }} />
+    <Box sx={{ flexGrow: 1 }} />
 
 
-    </Scrollbar>
-  );
+  </Scrollbar>
+  }
+    
 
   return (
     <Box
@@ -108,7 +115,7 @@ export default function Nav({ openNav, onCloseNav }) {
             borderRight: (theme) => `dashed 1px ${theme.palette.divider}`,
           }}
         >
-          {renderContent}
+          {RenderContent(user)}
         </Box>
       ) : (
         <Drawer
@@ -120,7 +127,7 @@ export default function Nav({ openNav, onCloseNav }) {
             },
           }}
         >
-          {renderContent}
+          {RenderContent(user)}
         </Drawer>
       )}
     </Box>

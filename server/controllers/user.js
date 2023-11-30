@@ -31,7 +31,13 @@ const register = async (req, res) => {
     role,
   };
 
-  attachCookiesToResponse(res, tokenUser);
+  const userFound = {
+    userName: user.userName,
+    profilePicture: user?.profilePicture,
+    email: user?.email,
+  };
+
+  attachCookiesToResponse(res, tokenUser, userFound);
 };
 
 const login = async (req, res) => {
@@ -56,10 +62,36 @@ const login = async (req, res) => {
 
   const tokenUser = { userId: userFound?._id, role: userFound.role, userName: userFound?.userName };
 
-  attachCookiesToResponse(res, tokenUser);
+  const user = {
+    userName: userFound.userName,
+    profilePicture: userFound?.profilePicture,
+    email: userFound?.email,
+  };
+
+  attachCookiesToResponse(res, tokenUser, user);
+};
+
+const getCurrentUser = async (req, res) => {
+  const foundUser = await User.findOne({ _id: req.user.userId }, '-password');
+  if (!foundUser) {
+    return errorResponse(res, 401, 'user does not exist');
+  }
+
+  return res.status(200).json({ user: foundUser });
+};
+
+const logOut = async (req, res) => {
+  res.cookie('token', 'logout', {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+
+  res.status(200).json('logged out successfully!');
 };
 
 module.exports = {
   register,
   login,
+  logOut,
+  getCurrentUser,
 };

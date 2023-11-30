@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const createJWT = async (tokenUser) => {
   return await jwt.sign(tokenUser, process.env.ACCESS_TOKEN, {
@@ -8,17 +9,17 @@ const createJWT = async (tokenUser) => {
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
-const attachCookiesToResponse = async (res, tokenUser) => {
+const attachCookiesToResponse = async (res, tokenUser,user) => {
   const token = await createJWT(tokenUser);
   res.cookie('token', token, {
     httpOnly: true,
     expires: new Date(Date.now() + ONE_DAY),
     secure: process.env.NODE_ENV === 'production',
     signed: true,
+    // sameSite:"none"
   });
-
-  res.status(200).json({ user: tokenUser });
-
+   
+  res.status(200).json({user})
 };
 
 module.exports = attachCookiesToResponse;

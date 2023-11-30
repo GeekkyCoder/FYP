@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
     type: String
   },
   profilePicture:{
-    type:String
+    type:String,
+    default:"https://cdn2.iconfinder.com/data/icons/rcons-users-color/32/boy-512.png"
   },
   role:{
     type:String,
