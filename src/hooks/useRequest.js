@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchData, postData, putData } from '../api/api';
+import { deleteData, fetchData, postData, putData } from '../api/api';
 
 //custom hook for get requests
 export const useGet = (endpoint, queryKey, enabled = true) => {
@@ -45,6 +45,28 @@ export const usePut = (endpoint, querykey) => {
   // Mutations
   const mutation = useMutation({
     mutationFn: (data) => putData(endpoint, data),
+    onSuccess: () => {
+      if (typeof queryData === 'object') {
+        for (let key of queryData) {
+          queryClient.invalidateQueries({ queryKey: key });
+        }
+        return;
+      }
+
+      queryClient.invalidateQueries({ queryKey: queryData });
+    },
+  });
+
+  return mutation;
+};
+
+export const useDelete = (endpoint, querykey) => {
+  const queryClient = useQueryClient();
+
+  const queryData = typeof querykey === 'object' ? [...querykey] : querykey;
+  // Mutations
+  const mutation = useMutation({
+    mutationFn: () => deleteData(endpoint),
     onSuccess: () => {
       if (typeof queryData === 'object') {
         for (let key of queryData) {

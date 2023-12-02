@@ -7,13 +7,13 @@ const createJWT = async (tokenUser) => {
   });
 };
 
-const ONE_DAY = 1000 * 60 * 60 * 24;
+const ONE_YEAR = 1000 * 60 * 60 * 24 * 365;
 
 const attachCookiesToResponse = async (res, tokenUser,user) => {
   const token = await createJWT(tokenUser);
   res.cookie('token', token, {
     httpOnly: true,
-    expires: new Date(Date.now() + ONE_DAY),
+    expires: new Date(Date.now() + ONE_YEAR),
     secure: process.env.NODE_ENV === 'production',
     signed: true,
     // sameSite:"none"

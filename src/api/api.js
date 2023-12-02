@@ -43,3 +43,15 @@ export const putData = async (endpoint, data) => {
     throw new Error('something went wrong');
   }
 };
+
+export const deleteData = async (endpoint) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${endpoint}`, {
+      method: 'Delete'
+    });
+    if (!response.ok) throw new Error('something went wrong');
+    return response.json();
+  } catch (err) {
+    throw new Error('something went wrong');
+  }
+};

@@ -13,20 +13,29 @@ import IconButton from '@mui/material/IconButton';
 
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
+import useFetch from 'src/hooks/use-fetch';
+import Spinner from 'src/components/Spinner/Spinner';
+import useSnackbar from 'src/hooks/use-snackbar';
+import MuiAlert from 'src/components/Alert/Alert';
 
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({
   selected,
+  id,
   name,
   avatarUrl,
-  company,
   role,
   isVerified,
   status,
   handleClick,
+  row,
 }) {
   const [open, setOpen] = useState(null);
+  const [deleted, setDeleted] = useState(false);
+
+  const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
+    useSnackbar();
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -36,11 +45,30 @@ export default function UserTableRow({
     setOpen(null);
   };
 
+  const handleDelete = async (rowId) => {
+    setDeleted(true);
+    try {
+      await useFetch().deleteRequest(`user/delete-user?id=${rowId}`);
+      setDeleted(false);
+      snackbarActions('account deleted', 'success', true);
+    } catch (err) {
+      snackbarActions(err?.message, 'error', true);
+      setDeleted(false);
+    }
+  };
+
   return (
     <>
+      <MuiAlert
+        alertSeverity={alertSeverity}
+        handleSnackbarClose={handleSnackbarClose}
+        snackbarMessage={snackbarMessage}
+        snackbarOpen={snackbarOpen}
+        origin={{ horizontal: 'center', vertical: 'bottom' }}
+      />
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
         <TableCell padding="checkbox">
-          <Checkbox disableRipple checked={selected} onChange={handleClick} />
+          <Checkbox disableRipple checked={selected} onChange={(e) => handleClick(e, name)} />
         </TableCell>
 
         <TableCell component="th" scope="row" padding="none">
@@ -51,8 +79,6 @@ export default function UserTableRow({
             </Typography>
           </Stack>
         </TableCell>
-
-        <TableCell>{company}</TableCell>
 
         <TableCell>{role}</TableCell>
 
@@ -84,9 +110,9 @@ export default function UserTableRow({
           Edit
         </MenuItem>
 
-        <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
-          <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-          Delete
+        <MenuItem onClick={() => handleDelete(id)}>
+          <Iconify icon="material-symbols-light:delete-outline" sx={{ mr: 2, color: 'red' }} />
+          {!deleted ? 'Delete' : <Spinner />}
         </MenuItem>
       </Popover>
     </>

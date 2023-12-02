@@ -114,6 +114,7 @@ export default function LoginView() {
       loginReset();
       snackbarActions("logged in successfully","success",true)
     } catch (err) {
+      console.log(err)
       snackbarActions(err?.message,"error",true)
       console.log(err);
     }

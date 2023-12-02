@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 
-import { users } from 'src/_mock/user';
+// import { users } from 'src/_mock/user';
 
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
@@ -21,10 +21,17 @@ import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
+import { useGet } from 'src/hooks/useRequest';
 
 // ----------------------------------------------------------------------
 
 export default function UserPage() {
+  const {
+    data: users,
+    isLoading: usersLoading,
+    error: userError,
+  } = useGet('user/all-users', 'users');
+
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -47,7 +54,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = users.map((n) => n.name);
+      const newSelecteds = users?.users?.map((n) => n.userName);
       setSelected(newSelecteds);
       return;
     }
@@ -72,6 +79,7 @@ export default function UserPage() {
     setSelected(newSelected);
   };
 
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -87,21 +95,18 @@ export default function UserPage() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: users,
+    inputData: !users ? [] : users?.users,
     comparator: getComparator(order, orderBy),
     filterName,
   });
 
-  const notFound = !dataFiltered.length && !!filterName;
+  const notFound = dataFiltered && !dataFiltered.length && !!filterName;
+
 
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Users</Typography>
-
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
-          New User
-        </Button>
       </Stack>
 
       <Card>
@@ -117,13 +122,12 @@ export default function UserPage() {
               <UserTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={users.length}
+                rowCount={users && users?.length}
                 numSelected={selected.length}
                 onRequestSort={handleSort}
                 onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
                   { id: 'role', label: 'Role' },
                   { id: 'isVerified', label: 'Verified', align: 'center' },
                   { id: 'status', label: 'Status' },
@@ -131,25 +135,27 @@ export default function UserPage() {
                 ]}
               />
               <TableBody>
-                {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      name={row.name}
-                      role={row.role}
-                      status={row.status}
-                      company={row.company}
-                      avatarUrl={row.avatarUrl}
-                      isVerified={row.isVerified}
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
-                    />
-                  ))}
+                {dataFiltered &&
+                  dataFiltered
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row) => (
+                      <UserTableRow
+                        key={row._id}
+                        id={row._id}
+                        name={row.userName}
+                        role={row.role}
+                        status={'active'}
+                        avatarUrl={row.profilePicture}
+                        isVerified={true}
+                        selected={selected.indexOf(row.userName) !== -1}
+                        handleClick={handleClick}
+                        row={row}
+                      />
+                    ))}
 
                 <TableEmptyRows
                   height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, users.length)}
+                  emptyRows={emptyRows(page, rowsPerPage, users?.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
@@ -158,15 +164,17 @@ export default function UserPage() {
           </TableContainer>
         </Scrollbar>
 
-        <TablePagination
-          page={page}
-          component="div"
-          count={users.length}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        {users && (
+          <TablePagination
+            page={page}
+            component="div"
+            count={users && users?.users?.length}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
+            rowsPerPageOptions={[5, 10, 25]}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        )}
       </Card>
     </Container>
   );

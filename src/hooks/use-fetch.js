@@ -1,45 +1,47 @@
+import axios from 'axios';
 const BASE_URL = 'http://localhost:8000';
 
 const useFetch = () => {
   const postRequest = async (url, payload, options = 'application/json') => {
-    // const hasOptions = !options ? {"Content-Type":"application/json"} : options
-
     try {
-      const resp = await fetch(`${BASE_URL}/${url}`, {
-        method: 'post',
-        body: JSON.stringify(payload),
-        headers: {
-          // "Content-Type": "application/json",
-          'Content-Type': options,
-        },
+      const { data } = await axios.post(`${BASE_URL}/${url}`, payload, {
+        withCredentials: true,
       });
-      // console.log(resp)
-      if (!resp.ok) throw new Error("something went wrong");
-      const data = await resp.json();
       return data;
     } catch (err) {
-      throw new Error(err);
+      throw new Error(err?.response?.data?.msg);
     }
   };
 
   const getRequest = async (url) => {
     try {
-      const resp = await fetch(`${BASE_URL}/${url}`);
-      if (!resp.ok) throw new Error('oops something went wrong');
-      const data = await resp.json();
+      const { data } = await axios.get(`${BASE_URL}/${url}`, {
+        withCredentials: true,
+      });
       return data;
     } catch (err) {
-      throw new Error(err?.message);
+      throw new Error(err?.response?.data?.msg);
     }
   };
 
   const deleteRequest = async (url) => {
     try {
-      await fetch(`${BASE_URL}/${url}`, {
-        method: 'delete',
+      await axios.delete(`${BASE_URL}/${url}`, {
+        withCredentials: true,
       });
     } catch (err) {
-      throw new Error(err?.message);
+      throw new Error(err?.response?.data?.msg);
+    }
+  };
+
+  const putRequest = async (url, payload, options = 'application/json') => {
+    try {
+      const { data } = await axios.put(`${BASE_URL}/${url}`, payload, {
+        withCredentials: true,
+      });
+      return data;
+    } catch (err) {
+      throw new Error(err?.response?.data?.msg);
     }
   };
 
@@ -47,6 +49,7 @@ const useFetch = () => {
     postRequest,
     getRequest,
     deleteRequest,
+    putRequest,
   };
 };
 

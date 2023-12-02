@@ -36,6 +36,10 @@ export default function Router() {
       ],
     },
     {
+      path: 'products',
+      element: <ProductsPage />,
+    },
+    {
       path: 'login',
       element: <LoginPage />,
     },
