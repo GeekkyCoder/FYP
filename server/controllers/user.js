@@ -135,6 +135,14 @@ const deleteUser = async (req, res) => {
   if (!foundUser) return res.status(StatusCodes.NOT_FOUND).json({ msg: 'user does not exist' });
 
   try {
+    //cant delete theirself as well
+    const himSelf = await User.findOne({ _id: req.user.userId });
+
+    if (himSelf?._id.toString() === id)
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ msg: 'cant not delete yourself, only admin can perform this action' });
+
     if (!checkPermission(req.user, id))
       return res.status(StatusCodes.UNAUTHORIZED).json({ msg: 'permission denied' });
     await User.findOneAndDelete({ _id: id });
