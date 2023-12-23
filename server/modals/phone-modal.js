@@ -15,6 +15,10 @@ const phoneSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    address: {
+      type: String,
+      required: true,
+    },
     owner: {
       userId: {
         type: mongoose.Schema.Types.ObjectId,

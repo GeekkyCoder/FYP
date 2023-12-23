@@ -1,30 +1,25 @@
 const BASE_URL = 'http://localhost:8000';
-// import axios from 'axios'
+import axios from 'axios';
 
 export const fetchData = async (endpoint) => {
   try {
-    const resp = await fetch(`${BASE_URL}/${endpoint}`);
-    if (!resp.ok) throw new Error('something went wrong');
-    return await resp.json();
+    const { data } = await axios.get(`${BASE_URL}/${endpoint}`, {
+      withCredentials: true,
+    });
+    return data;
   } catch (err) {
-    throw new Error('something went wrong');
+    throw new Error(err?.response?.data?.msg);
   }
 };
 
-export const postData = async (endpoint, data) => {
+export const postData = async (endpoint, payload) => {
   try {
-    const response = await fetch(`${BASE_URL}/${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-
-      body: JSON.stringify(data),
+    const { data } = await axios.post(`${BASE_URL}/${endpoint}`, payload, {
+      withCredentials: true,
     });
-    if (!response.ok) throw new Error('something went wrong');
-    return response.json();
+    return data;
   } catch (err) {
-    throw new Error('something went wrong');
+    throw new Error(err?.response?.data?.msg);
   }
 };
 
@@ -47,7 +42,7 @@ export const putData = async (endpoint, data) => {
 export const deleteData = async (endpoint) => {
   try {
     const response = await fetch(`${BASE_URL}/${endpoint}`, {
-      method: 'Delete'
+      method: 'Delete',
     });
     if (!response.ok) throw new Error('something went wrong');
     return response.json();

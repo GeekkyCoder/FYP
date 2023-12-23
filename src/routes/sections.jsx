@@ -8,12 +8,12 @@ export const IndexPage = lazy(() => import('../pages/app'));
 export const BlogPage = lazy(() => import('..//pages/blog'));
 export const UserPage = lazy(() => import('..//pages/user'));
 export const LoginPage = lazy(() => import('../pages/login'));
+export const PhonePage = lazy(() => import('../pages/phone'));
 export const ProductsPage = lazy(() => import('../pages/products'));
 export const Page404 = lazy(() => import('../pages/page-not-found'));
 
 // ----------------------------------------------------------------------
 
-// Mock authentication function, replace this with your actual authentication logic
 
 export default function Router() {
   const { ProtectedRoute } = useProtectedRoute();
@@ -33,6 +33,7 @@ export default function Router() {
         { path: 'user', element: <ProtectedRoute element={<UserPage />} /> },
         { path: 'products', element: <ProtectedRoute element={<ProductsPage />} /> },
         { path: 'blog', element: <ProtectedRoute element={<BlogPage />} /> },
+        { path: 'phone', element: <ProtectedRoute element={<PhonePage />} /> },
       ],
     },
     {

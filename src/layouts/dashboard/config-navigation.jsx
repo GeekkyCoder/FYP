@@ -32,6 +32,11 @@ const navConfig = [
     path: '/login',
     icon: icon('ic_lock'),
   },
+  {
+    title: 'phone',
+    path: '/phone',
+    icon: icon('ic_blog'),
+  },
   // {
   //   title: 'Not found',
   //   path: '/404',
