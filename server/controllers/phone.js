@@ -1,7 +1,9 @@
 const { StatusCodes } = require('http-status-codes');
 const { errorResponse } = require('../utils/errResponse');
 const Phone = require('../modals/phone-modal');
+const Comment = require('../modals/comments.modal');
 const User = require('../modals/user.modal');
+const checkPermission = require('../middlewares/check-auth');
 
 async function addNewPhoneEntry(req, res) {
   const { imei, brand, model, description, address } = req.body;
@@ -37,6 +39,74 @@ async function addNewPhoneEntry(req, res) {
   }
 }
 
+async function getAllPhones(req, res) {
+  const phones = await Phone.find({});
+  return res.status(StatusCodes.OK).json({ phones });
+}
+
+//phoneId query
+async function deletePhone(req, res) {
+  const { phoneId } = req?.query;
+  const phone = await Phone?.findOne({ _id: phoneId });
+
+  const phoneCreatedByUser = phone?.owner?.userId?.toString();
+
+  if (!(phoneCreatedByUser === req?.user?.userId)) {
+    return errorResponse(res, 404, 'you are not allowed to delete this phone');
+  }
+
+  if (!checkPermission(req?.user, phoneCreatedByUser))
+    return res.status(StatusCodes.UNAUTHORIZED).json({ msg: 'you can not access this route' });
+
+  await Phone?.deleteOne({ _id: phoneId });
+  await Comment?.deleteMany({ phone: phoneId });
+
+  res.status(StatusCodes.OK).json({ msg: `deleted phone with imei ${phone?.imei}` });
+}
+
+async function updatePhone(req, res) {
+  const { phoneId } = req?.query;
+
+  const { status } = req.body;
+
+  if (!status?.length) {
+    return errorResponse(res, 404, 'please update the status');
+  }
+
+  //find phon  created by loggged in user
+  const phone = await Phone?.findOne({ _id: phoneId });
+
+  const userOfPhone = phone?.owner?.userId?.toString();
+
+  if (!checkPermission(req?.user, userOfPhone)) {
+    return errorResponse(res, 401, 'you are not allowed to update someone information');
+  }
+
+  const updatedPhone = await Phone?.findOneAndUpdate({ _id: phoneId }, req.body, {
+    upsert: true,
+    new: true,
+  });
+
+  return res
+    .status(StatusCodes.CREATED)
+    .json({ msg: `updated information of phone with imei ${phone?.imei}`, phone: updatedPhone });
+}
+
+async function getCommentsOfPhone(req, res) {
+  const { phoneId } = req.query;
+  if (!phoneId) {
+    return errorResponse(res, 404, 'could not locate phone');
+  }
+
+  const comments = await Comment?.find({ phone: phoneId });
+
+  res.status(StatusCodes.OK).json({ comments });
+}
+
 module.exports = {
   addNewPhoneEntry,
+  getAllPhones,
+  getCommentsOfPhone,
+  deletePhone,
+  updatePhone,
 };

@@ -6,6 +6,7 @@ const { userRouter } = require('./routes/user.routes');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const { phoneRouter } = require('./routes/phone.routes');
+const { commentRouter } = require('./routes/comment.routes');
 require("express-async-errors");
 
 const app = express();
@@ -26,6 +27,8 @@ app.use(cors({
 
 app.use('/user', userRouter);
 app.use('/phone', phoneRouter);
+app.use('/comment', commentRouter);
+
 
 app.use("/", (req, res) => {
   res.sendFile(path.resolve(__dirname, "..","./dist/index.html"));
