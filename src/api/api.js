@@ -41,12 +41,10 @@ export const putData = async (endpoint, data) => {
 
 export const deleteData = async (endpoint) => {
   try {
-    const response = await fetch(`${BASE_URL}/${endpoint}`, {
-      method: 'Delete',
+    const { data } = await axios.delete(`${BASE_URL}/${endpoint}`, {
+      withCredentials: true,
     });
-    if (!response.ok) throw new Error('something went wrong');
-    return response.json();
   } catch (err) {
-    throw new Error('something went wrong');
+    throw new Error(err?.response?.data?.msg);
   }
 };

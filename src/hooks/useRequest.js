@@ -3,12 +3,12 @@ import { deleteData, fetchData, postData, putData } from '../api/api';
 
 //custom hook for get requests
 export const useGet = (endpoint, queryKey, enabled = true) => {
-  const queryKeyValue = typeof queryKey === 'object' ? [...queryKey] : [queryKey];
+  const queryKeyValue = typeof queryKey === 'object' ? [...queryKey] : queryKey;
 
   return useQuery({
     queryKey: queryKeyValue,
     queryFn: () => fetchData(endpoint),
-    enabled: enabled,
+    // enabled: enabled,
     refetchOnMount: true,
     retryOnMount: true,
   });

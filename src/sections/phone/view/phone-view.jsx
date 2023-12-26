@@ -10,6 +10,7 @@ import PhoneDetails from './phone-details';
 import useSnackbar from 'src/hooks/use-snackbar';
 import Alert from 'src/components/Alert/Alert';
 import MuiDialog from 'src/components/Dialog/Dialog';
+import PhoneCards from './phone-cards';
 
 export default function PhoneView() {
   const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
@@ -99,6 +100,7 @@ export default function PhoneView() {
         >
           <PhoneDetails snackbarActions={snackbarActions} />
         </MuiDialog>
+        <PhoneCards/>
       </>
     </>
   );

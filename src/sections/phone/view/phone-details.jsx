@@ -30,7 +30,7 @@ const phoneSchema = yup.object().shape({
   brand: yup.string().oneOf(['samsung', 'motorolla', 'xiomi', 'iphone', 'realme']).required(),
   model: yup.string().required(),
   imei: yup.string().min(15).max(15).required(),
-  description: yup.string().min(10).max(30).required(),
+  description: yup.string().min(30).max(1200).required(),
 });
 
 function PhoneDetails({ snackbarActions }) {
@@ -39,10 +39,7 @@ function PhoneDetails({ snackbarActions }) {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState('');
 
-  console.log(address);
-
-  const addressRef = useRef();
-  const { mutateAsync, isLoading } = usePost('phone/add/new-entry', ['phones']);
+  const { mutateAsync, isLoading } = usePost('phone/add/new-entry', ['phonesData']);
 
   const {
     control,
@@ -150,6 +147,7 @@ function PhoneDetails({ snackbarActions }) {
       >
         PHONE DETAILS
       </Typography>
+      {/* dialog and map form  start */}
       <Stack direction={'row'} alignItems={'flex-start'} spacing={4}>
         <Box
           onSubmit={handleSubmit(onSubmit)}
@@ -289,6 +287,7 @@ function PhoneDetails({ snackbarActions }) {
         </Box>
         <MapComponent setAddress={setAddress} />
       </Stack>
+      {/* dialog and map form  start */}
     </>
   );
 }
