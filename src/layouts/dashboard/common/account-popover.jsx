@@ -31,7 +31,6 @@ import useSnackbar from 'src/hooks/use-snackbar';
 import { useRouter } from 'src/routes/hooks';
 const defaultUpdateUserForm = {
   UserName: '',
-  Email: '',
 };
 
 const updateUserSchema = yup.object().shape({
@@ -43,7 +42,6 @@ const updateUserSchema = yup.object().shape({
       /^[a-zA-Z]+(\s*[a-zA-Z0-9]*)*$/,
       'should start with digit and can not include special symbols'
     ),
-  Email: yup.string().email(),
 });
 
 // ----------------------------------------------------------------------
@@ -134,14 +132,13 @@ export default function AccountPopover() {
 
     const payload = {
       userName: data.UserName,
-      email: data?.Email,
       profilePicture: image_url,
     };
 
     try {
       const updatedUser = await useFetch().putRequest('user/update-user', payload);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser?.user));
+      setUser(updatedUser?.user);
       snackbarActions('information updated', 'success', true);
       setIsLoading(false);
     } catch (err) {
@@ -238,17 +235,6 @@ export default function AccountPopover() {
                       helperText={updateErrors?.UserName ? updateErrors?.UserName.message : ''}
                       type={'text'}
                       fullWidth={true}
-                    />
-
-                    <ControlInput
-                      name="Email"
-                      label={user?.email}
-                      control={updateControl}
-                      error={!!updateErrors?.Email}
-                      helperText={updateErrors?.Email ? updateErrors?.Email.message : ''}
-                      type={'email'}
-                      fullWidth={true}
-                      icon={'ic:baseline-email'}
                     />
 
                     <Stack direction={'column'}>

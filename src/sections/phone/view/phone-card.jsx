@@ -8,11 +8,15 @@ import {
   DialogContent,
   IconButton,
 } from '@mui/material';
-import { CommentBank, DeleteForever, CloseOutlined } from '@mui/icons-material';
+import { CommentBank, DeleteForever, CloseOutlined, AddComment } from '@mui/icons-material';
 import Card from '@mui/material/Card';
 import MuiAvatar from 'src/components/Avatar/Avatar';
 import Typography from 'src/components/Typography/Typography';
 import { formatDate } from 'src/utils/date-formate';
+
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -28,19 +32,17 @@ import useAuth from 'src/hooks/useAuth';
 import { useDelete, usePost } from 'src/hooks/useRequest';
 import useSnackbar from 'src/hooks/use-snackbar';
 import Alert from 'src/components/Alert/Alert';
+import ControlInput from 'src/components/ControlInput/ControlInput';
 
 //for confirm dialog
 
-// import { styled } from '@mui/material';
+const defaultCommentForm = {
+  comment: '',
+};
 
-// const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-//   '& .MuiDialogContent-root': {
-//     padding: theme.spacing(2),
-//   },
-//   '& .MuiDialogActions-root': {
-//     padding: theme.spacing(1),
-//   },
-// }));
+const commentSchema = yup.object().shape({
+  comment: yup.string().min(40).max(1000).required(),
+});
 
 const settings = {
   dots: true,
@@ -50,19 +52,33 @@ const settings = {
   slidesToScroll: 1,
 };
 
-function CommentModel({ open, handleOpen, handleClose, comments, user, phoneId }) {
-  const { mutateAsync } = usePost(`comment/createcomment?phoneId=${phoneId}`, ['phonesData']);
-
-  const handleCreateComment = async () => {
-    try {
-      await mutateAsync({ comment: 'hello how are you soghat' });
-    } catch (err) {
-      console.log(err);
-    }
-  };
+function CommentModel({
+  open,
+  handleOpen,
+  handleClose,
+  comments,
+  user,
+  // handleAddCommentDialogOpen,
+  phoneId,
+  phoneModel,
+  snackbarActions,
+}) {
+  const {
+    open: addCommentDialogOpen,
+    handleClose: handleAddCommentDialogClose,
+    handleOpen: handleAddCommentDialogOpen,
+  } = useDialog();
 
   return (
     <>
+      <AddCommentModal
+        open={addCommentDialogOpen}
+        handleClose={handleAddCommentDialogClose}
+        handleOpen={handleAddCommentDialogOpen}
+        phoneId={phoneId}
+        phoneModel={phoneModel}
+        snackbarActions={snackbarActions}
+      />
       <MuiDialog
         dialogTitle={'Comments'}
         handleClose={handleClose}
@@ -76,7 +92,7 @@ function CommentModel({ open, handleOpen, handleClose, comments, user, phoneId }
               <Button
                 variant={'contained'}
                 type={'button'}
-                onClickHandler={() => handleCreateComment(phoneId)}
+                onClickHandler={handleAddCommentDialogOpen}
               >
                 Add A Comment
               </Button>
@@ -130,7 +146,7 @@ function CommentModel({ open, handleOpen, handleClose, comments, user, phoneId }
             <Button
               variant={'contained'}
               type={'button'}
-              onClickHandler={() => handleCreateComment(phoneId)}
+              onClickHandler={handleAddCommentDialogOpen}
             >
               Add A Comment
             </Button>
@@ -225,6 +241,82 @@ function ConfirmDialog({ handleClose, confirmDialogOpen, phoneData, snackbarActi
   );
 }
 
+function AddCommentModal({ open, handleOpen, handleClose, phoneModel, phoneId, snackbarActions }) {
+  const { mutateAsync, isloading } = usePost(`comment/createcomment?phoneId=${phoneId}`, [
+    'phonesData',
+  ]);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
+      ...defaultCommentForm,
+    },
+    resolver: yupResolver(commentSchema),
+  });
+
+  const onSubmit = async (data) => {
+    try {
+      await mutateAsync(data);
+      snackbarActions('comment posted', 'success', true);
+      handleClose();
+      reset();
+    } catch (err) {
+      snackbarActions(err?.msg, 'error', true);
+    }
+  };
+
+  return (
+    <>
+      <MuiDialog
+        handleClose={handleClose}
+        handleOpen={handleOpen}
+        open={open}
+        maxWidth={'xs'}
+        dialogTitle={`${phoneModel}`}
+        fullScreen={false}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <ToolTip title={'close'}>
+            <IconButton>
+              <CloseOutlined onClick={handleClose} />
+            </IconButton>
+          </ToolTip>
+        </Box>
+        <Typography component={'div'} variant={'h4'} sx={{ textAlign: 'center', my: '1em' }}>
+          {phoneModel}
+        </Typography>
+        <Box component={'form'} onSubmit={handleSubmit(onSubmit)}>
+          <Box sx={{ mb: '2em' }}>
+            <ControlInput
+              name={'comment'}
+              control={control}
+              fullWidth={true}
+              helperText={errors?.comment ? errors?.comment?.message : ''}
+              error={!!errors?.comment}
+              label={'Comment'}
+              mulitine={true}
+            />
+          </Box>
+          <Button
+            type={'submit'}
+            icon={<AddComment />}
+            loading={isloading}
+            fullWidth={true}
+            variant={'contained'}
+            sx={{ mt: '2em' }}
+          >
+            Post Comment
+          </Button>
+        </Box>
+      </MuiDialog>
+    </>
+  );
+}
+
 function PhoneCard({ phone }) {
   const { handleClose, handleOpen, open } = useDialog();
 
@@ -253,6 +345,7 @@ function PhoneCard({ phone }) {
         phoneData={phone}
         snackbarActions={snackbarActions}
       />
+
       <Card sx={{ width: '100%', p: '1em', my: '2em' }}>
         <Stack direction={'row'} spacing={2} justifyContent={'space-between'}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -315,7 +408,9 @@ function PhoneCard({ phone }) {
           handleOpen={handleOpen}
           open={open}
           user={user}
+          snackbarActions={snackbarActions}
           phoneId={phone?._id}
+          phoneModel={phone?.model}
         />
         <Typography
           component={'div'}
