@@ -3,6 +3,7 @@ const Comment = require('../modals/comments.modal');
 const User = require('../modals/user.modal');
 const { errorResponse } = require('../utils/errResponse');
 const { StatusCodes } = require('http-status-codes');
+const mongoose = require('mongoose');
 
 async function createComment(req, res) {
   const { comment } = req.body;
@@ -44,6 +45,28 @@ async function createComment(req, res) {
   return res.status(StatusCodes.CREATED).json({ msg: `comment posted`, comment: newComment });
 }
 
+async function deleteComment(req, res) {
+  const commentId = req.query.commentId;
+  const phoneId = req.query.phoneId;
+
+  //find the phone
+  const phone = await Phone.findOne({ _id: phoneId });
+  const comment = await Comment.findOne({ _id: commentId });
+
+  if (!phone) {
+    return errorResponse(res, 404, `phone not found`);
+  }
+
+  if (!comment) {
+    return errorResponse(res, 404, 'comment does not exist');
+  }
+
+  await Comment.findByIdAndDelete(commentId);
+
+  return res.status(200).json({ msg: 'comment deleted' });
+}
+
 module.exports = {
   createComment,
+  deleteComment,
 };

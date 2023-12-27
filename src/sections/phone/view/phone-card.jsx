@@ -58,7 +58,6 @@ function CommentModel({
   handleClose,
   comments,
   user,
-  // handleAddCommentDialogOpen,
   phoneId,
   phoneModel,
   snackbarActions,
@@ -125,13 +124,13 @@ function CommentModel({
                       </Box>
                     </Box>
 
-                    {user?.email === comment?.owner.email && (
+                    {/* {user?.email === comment?.owner.email && (
                       <Box>
                         <ToolTip title={'delete'}>
                           <DeleteForever />
                         </ToolTip>
                       </Box>
-                    )}
+                    )} */}
                   </Stack>
                   <Divider />
                 </Box>
@@ -249,7 +248,7 @@ function AddCommentModal({ open, handleOpen, handleClose, phoneModel, phoneId, s
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, touchedFields },
     reset,
   } = useForm({
     defaultValues: {
@@ -295,7 +294,11 @@ function AddCommentModal({ open, handleOpen, handleClose, phoneModel, phoneId, s
               name={'comment'}
               control={control}
               fullWidth={true}
-              helperText={errors?.comment ? errors?.comment?.message : ''}
+              helperText={
+                touchedFields?.comment && errors?.comment
+                  ? errors?.comment?.message
+                  : '15 digit IMEI number of phone'
+              }
               error={!!errors?.comment}
               label={'Comment'}
               mulitine={true}

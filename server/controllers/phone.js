@@ -103,10 +103,29 @@ async function getCommentsOfPhone(req, res) {
   res.status(StatusCodes.OK).json({ comments });
 }
 
+async function showPhoneStatus(req, res) {
+  const { imei } = req.body;
+
+  if (!imei) {
+    return errorResponse(res, 404, 'please enter the details');
+  }
+
+  //look for phone in db
+  const foundPhone = await Phone.findOne({ imei });
+
+  if (!foundPhone) {
+    return errorResponse(res, 404, `phone does not exist with imei ${imei}`);
+  }
+
+  //found the phone
+  return res.status(200).json({ phone: foundPhone });
+}
+
 module.exports = {
   addNewPhoneEntry,
   getAllPhones,
   getCommentsOfPhone,
   deletePhone,
   updatePhone,
+  showPhoneStatus,
 };

@@ -63,6 +63,7 @@ const phoneSchema = new mongoose.Schema(
     comments: {
       type: [Object],
       default: [],
+      ref:"Comment"
     },
   },
   { timestamps: true }
