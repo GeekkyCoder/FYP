@@ -73,7 +73,7 @@ export default function AccountPopover() {
     data: userPhones,
     isLoading: userPhonesLoading,
     error: userPhonesError,
-  } = useGet('phone/user-phones', ['user-phones']);
+  } = useGet('phone/getallphones', ['phonesData']);
 
   const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
     useSnackbar();
@@ -182,11 +182,13 @@ export default function AccountPopover() {
         maxWidth={'lg'}
       >
         <>
-          {userPhonesLoading && <Spinner/>}
-          {userPhones && userPhones?.phones?.length > 0 ? (
-            userPhones?.phones?.map((phone) => {
-              return <PhoneCard key={phone?._id} phone={phone} />;
-            })
+          {userPhonesLoading && <Spinner />}
+          {userPhones && userPhones.phones.filter(phone => phone.owner.email === user.email).length > 0 ? (
+            userPhones?.phones
+              .filter((phone) => phone.owner.email === user.email)
+              .map((phone) => {
+                return <PhoneCard key={phone?._id} phone={phone} />;
+              })
           ) : userPhonesError ? (
             <Typography
               component={'div'}

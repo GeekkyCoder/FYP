@@ -106,15 +106,15 @@ async function getCommentsOfPhone(req, res) {
 async function showPhoneStatus(req, res) {
   const { imei } = req.body;
 
-  if (!imei) {
-    return errorResponse(res, 404, 'please enter the details');
+  if (!imei.length) {
+    return errorResponse(res, 404, 'please provide imei 15 digits of phone');
   }
 
   //look for phone in db
   const foundPhone = await Phone.findOne({ imei });
 
   if (!foundPhone) {
-    return errorResponse(res, 404, `phone does not exist with imei ${imei}`);
+    return errorResponse(res, 404, `incorrect imei or might not be registered in our site`);
   }
 
   //found the phone

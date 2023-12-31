@@ -364,7 +364,13 @@ function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActi
 
     try {
       await mutateAsync(data);
-      snackbarActions('updated', 'success', true);
+      snackbarActions(
+        `updated information of phone with imei ${phoneToUpdate?.imei}`,
+        'success',
+        true
+      );
+      handleClose();
+      editReset()
     } catch (err) {
       snackbarActions(err?.msg, 'error', true);
     }
