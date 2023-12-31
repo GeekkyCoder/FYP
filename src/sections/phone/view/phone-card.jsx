@@ -8,7 +8,14 @@ import {
   DialogContent,
   IconButton,
 } from '@mui/material';
-import { CommentBank, DeleteForever, CloseOutlined, AddComment } from '@mui/icons-material';
+import {
+  CommentBank,
+  DeleteForever,
+  CloseOutlined,
+  AddComment,
+  Edit,
+  Done,
+} from '@mui/icons-material';
 import Card from '@mui/material/Card';
 import MuiAvatar from 'src/components/Avatar/Avatar';
 import Typography from 'src/components/Typography/Typography';
@@ -29,10 +36,12 @@ import useDialog from 'src/hooks/use-dialog';
 import Button from 'src/components/Button/Button';
 
 import useAuth from 'src/hooks/useAuth';
-import { useDelete, usePost } from 'src/hooks/useRequest';
+import { useDelete, usePost, usePut } from 'src/hooks/useRequest';
 import useSnackbar from 'src/hooks/use-snackbar';
 import Alert from 'src/components/Alert/Alert';
 import ControlInput from 'src/components/ControlInput/ControlInput';
+import { useMemo } from 'react';
+import SelectComp from 'src/components/controlSelect/ControlSelect';
 
 //for confirm dialog
 
@@ -40,8 +49,16 @@ const defaultCommentForm = {
   comment: '',
 };
 
+const options = ['recovered', 'stolen'];
+
 const commentSchema = yup.object().shape({
   comment: yup.string().min(40).max(1000).required(),
+});
+
+const editSchema = yup.object().shape({
+  description: yup.string().notRequired().nullable(),
+  status: yup.string().required().oneOf[('recovered', 'stolen')],
+  address: yup.string().nullable(),
 });
 
 const settings = {
@@ -294,11 +311,7 @@ function AddCommentModal({ open, handleOpen, handleClose, phoneModel, phoneId, s
               name={'comment'}
               control={control}
               fullWidth={true}
-              helperText={
-                touchedFields?.comment && errors?.comment
-                  ? errors?.comment?.message
-                  : '15 digit IMEI number of phone'
-              }
+              helperText={touchedFields?.comment && errors?.comment ? errors?.comment?.message : ''}
               error={!!errors?.comment}
               label={'Comment'}
               mulitine={true}
@@ -320,6 +333,86 @@ function AddCommentModal({ open, handleOpen, handleClose, phoneModel, phoneId, s
   );
 }
 
+function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActions }) {
+  const { mutateAsync } = usePut(`phone/updatephone?phoneId=${phoneToUpdate?._id}`, ['phonesData']);
+
+  const defaultSchema = useMemo(() => {
+    return {
+      description: phoneToUpdate.description,
+      address: phoneToUpdate.address,
+      status: phoneToUpdate.status,
+    };
+  }, [phoneToUpdate]);
+
+  const {
+    control: editControl,
+    handleSubmit: handleEditSubmit,
+    formState: { errors: editErrors, touchedFields: editTouchedFields },
+    reset: editReset,
+  } = useForm({
+    defaultValues: {
+      ...defaultSchema,
+    },
+    resolver: yupResolver(editSchema),
+  });
+
+  const onSubmit = async (data) => {
+    let payload = {};
+    if (data.description) payload.description = data.description;
+    if (data.address) payload.address = data.address;
+    if (data.status) payload.status = data.status;
+
+    try {
+      await mutateAsync(data);
+      snackbarActions('updated', 'success', true);
+    } catch (err) {
+      snackbarActions(err?.msg, 'error', true);
+    }
+  };
+
+  return (
+    <>
+      <MuiDialog open={open} handleOpen={handleOpen} handleClose={handleClose}>
+        <Box component={'form'} onSubmit={handleEditSubmit(onSubmit)}>
+          <Box sx={{ my: '1em', p: '1em' }}>
+            <ControlInput
+              mulitine={true}
+              control={editControl}
+              helperText={editErrors?.description ? editErrors.description.message : ''}
+              error={!!editErrors?.description}
+              label={'Description'}
+              name={'description'}
+            />
+          </Box>
+          <Box sx={{ my: '1em' }}>
+            <ControlInput
+              mulitine={true}
+              control={editControl}
+              helperText={editErrors?.address ? editErrors.address.message : ''}
+              error={!!editErrors?.address}
+              label={'Address'}
+              name={'address'}
+            />
+          </Box>
+          <Box>
+            <SelectComp
+              control={editControl}
+              name={'status'}
+              menuItems={options}
+              label={'Status'}
+            />
+          </Box>
+          <Box sx={{ mt: '2em' }}>
+            <Button type={'submit'} fullWidth={true} icon={<Done />} variant={'contained'}>
+              Submit
+            </Button>
+          </Box>
+        </Box>
+      </MuiDialog>
+    </>
+  );
+}
+
 function PhoneCard({ phone }) {
   const { handleClose, handleOpen, open } = useDialog();
 
@@ -327,6 +420,12 @@ function PhoneCard({ phone }) {
     handleClose: handleConfirmDialogClose,
     handleOpen: handleConfirmDialogOpen,
     open: confirmDialogOpen,
+  } = useDialog();
+
+  const {
+    open: editDialogOpen,
+    handleOpen: handleEditDialogOpen,
+    handleClose: handleEditDailogClose,
   } = useDialog();
 
   const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
@@ -346,6 +445,14 @@ function PhoneCard({ phone }) {
         handleClose={handleConfirmDialogClose}
         confirmDialogOpen={confirmDialogOpen}
         phoneData={phone}
+        snackbarActions={snackbarActions}
+      />
+
+      <EditDialog
+        open={editDialogOpen}
+        handleOpen={handleEditDialogOpen}
+        handleClose={handleEditDailogClose}
+        phoneToUpdate={phone}
         snackbarActions={snackbarActions}
       />
 
@@ -380,6 +487,9 @@ function PhoneCard({ phone }) {
 
           {user?.email === phone?.owner?.email && (
             <Box>
+              <ToolTip title={'update'}>
+                <Edit onClick={handleEditDialogOpen} />
+              </ToolTip>
               <ToolTip title={'delete'}>
                 <DeleteForever onClick={handleConfirmDialogOpen} />
               </ToolTip>

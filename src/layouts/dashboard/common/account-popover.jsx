@@ -17,7 +17,6 @@ import useFetch from 'src/hooks/use-fetch';
 import MuiDialog from 'src/components/Dialog/Dialog';
 import useDialog from 'src/hooks/use-dialog';
 import Logo from 'src/components/logo';
-import Iconify from 'src/components/iconify';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -29,6 +28,9 @@ import { CloseOutlined } from '@mui/icons-material';
 import useCloudinary from 'src/hooks/use-cloudinary';
 import useSnackbar from 'src/hooks/use-snackbar';
 import { useRouter } from 'src/routes/hooks';
+import { useGet } from 'src/hooks/useRequest';
+import PhoneCard from 'src/sections/phone/view/phone-card';
+
 const defaultUpdateUserForm = {
   UserName: '',
 };
@@ -46,26 +48,32 @@ const updateUserSchema = yup.object().shape({
 
 // ----------------------------------------------------------------------
 
-const MENU_OPTIONS = [
-  {
-    label: 'Home',
-    icon: 'eva:home-fill',
-  },
-  {
-    label: 'Profile',
-    icon: 'eva:person-fill',
-  },
-  {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
-  },
-];
+// const MENU_OPTIONS = [
+//   {
+//     label: 'Home',
+//     icon: 'eva:home-fill',
+//   },
+//   {
+//     label: 'Profile',
+//     icon: 'eva:person-fill',
+//   },
+//   {
+//     label: 'Settings',
+//     icon: 'eva:settings-2-fill',
+//   },
+// ];
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    data: userPhones,
+    isLoading: userPhonesLoading,
+    error: userPhonesError,
+  } = useGet('phone/user-phones', ['user-phones']);
 
   const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
     useSnackbar();
@@ -90,6 +98,12 @@ export default function AccountPopover() {
     handleClose: handleDialogClose,
     handleOpen: handleDialogOpen,
     open: dialogOpen,
+  } = useDialog();
+
+  const {
+    handleClose: handlePostingDialogClose,
+    handleOpen: handlePostingDialogOpen,
+    open: postingDialogOpen,
   } = useDialog();
 
   const [open, setOpen] = useState(null);
@@ -148,6 +162,10 @@ export default function AccountPopover() {
     }
   };
 
+  const handlePostingsClick = () => {
+    handlePostingDialogOpen();
+  };
+
   return (
     <>
       <Alert
@@ -156,6 +174,38 @@ export default function AccountPopover() {
         snackbarMessage={snackbarMessage}
         snackbarOpen={snackbarOpen}
       />
+      <MuiDialog
+        handleClose={handlePostingDialogClose}
+        handleOpen={handlePostingDialogOpen}
+        open={postingDialogOpen}
+        dialogTitle={`Your Posts`}
+        maxWidth={'lg'}
+      >
+        <>
+          {userPhonesLoading && <Spinner/>}
+          {userPhones && userPhones?.phones?.length > 0 ? (
+            userPhones?.phones?.map((phone) => {
+              return <PhoneCard key={phone?._id} phone={phone} />;
+            })
+          ) : userPhonesError ? (
+            <Typography
+              component={'div'}
+              variant="body1"
+              sx={{ fontSize: '1.5rem', textAlign: 'center' }}
+            >
+              Somehing Went Wrong,could noot fetch your posts
+            </Typography>
+          ) : (
+            <Typography
+              component={'div'}
+              variant="body1"
+              sx={{ fontSize: '1.5rem', textAlign: 'center' }}
+            >
+              You have not posted anything yet
+            </Typography>
+          )}
+        </>
+      </MuiDialog>
       <MuiDialog
         handleClose={handleDialogClose}
         handleOpen={handleDialogOpen}
@@ -340,14 +390,9 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        {/* {MENU_OPTIONS.map((option) => (
-          <MenuItem key={option.label} onClick={handleClose}>
-            {option.label}
-          </MenuItem>
-        ))} */}
-        <MenuItem>Home</MenuItem>
-
         <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+
+        <MenuItem onClick={handlePostingsClick}>Postings</MenuItem>
 
         <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
 

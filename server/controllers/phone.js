@@ -70,7 +70,7 @@ async function updatePhone(req, res) {
   const { status } = req.body;
 
   if (!status?.length) {
-    return errorResponse(res, 404, 'please update the status');
+    return errorResponse(res, 404, 'status is required field');
   }
 
   //find phon  created by loggged in user
@@ -121,9 +121,23 @@ async function showPhoneStatus(req, res) {
   return res.status(200).json({ phone: foundPhone });
 }
 
+async function getUserPhones(req, res) {
+  const findUser = await User.findOne({ _id: req?.user?.userId });
+
+  if (!findUser) {
+    return errorResponse(res, 401, 'user does not exist');
+  }
+
+  //find his/her phones
+  const phonesOfUser = await Phone.find({ 'owner.userId': req?.user?.userId });
+
+  return res.status(StatusCodes.OK).json({ phones: phonesOfUser });
+}
+
 module.exports = {
   addNewPhoneEntry,
   getAllPhones,
+  getUserPhones,
   getCommentsOfPhone,
   deletePhone,
   updatePhone,

@@ -9,8 +9,10 @@ export const useGet = (endpoint, queryKey, enabled = true) => {
     queryKey: queryKeyValue,
     queryFn: () => fetchData(endpoint),
     // enabled: enabled,
-    refetchOnMount: true,
+    refetchOnMount: "always",
+    gcTime:2000,
     retryOnMount: true,
+    staleTime:1000,
   });
 };
 

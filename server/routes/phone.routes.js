@@ -7,6 +7,7 @@ const {
   deletePhone,
   updatePhone,
   showPhoneStatus,
+  getUserPhones,
 } = require('../controllers/phone');
 
 const phoneRouter = require('express').Router();
@@ -17,6 +18,7 @@ phoneRouter.get('/getcomments', authMiddleware, getCommentsOfPhone);
 phoneRouter.delete('/deletephone', [authMiddleware, authorize('admin', 'user')], deletePhone);
 phoneRouter.put('/updatephone', [authMiddleware, authorize('admin', 'user')], updatePhone);
 phoneRouter.post('/showphonestatus', [authMiddleware, authorize('admin', 'user')], showPhoneStatus);
+phoneRouter.get('/user-phones', [authMiddleware, authorize('admin', 'user')], getUserPhones);
 
 module.exports = {
   phoneRouter,
