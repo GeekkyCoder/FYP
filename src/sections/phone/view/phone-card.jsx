@@ -8,7 +8,7 @@ import {
   DialogContent,
   IconButton,
   Badge,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import {
   CommentBank,
@@ -42,8 +42,9 @@ import { useDelete, usePost, usePut } from 'src/hooks/useRequest';
 import useSnackbar from 'src/hooks/use-snackbar';
 import Alert from 'src/components/Alert/Alert';
 import ControlInput from 'src/components/ControlInput/ControlInput';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import SelectComp from 'src/components/controlSelect/ControlSelect';
+import MarkdownEditor from 'src/components/MarkdownEditor/MarkdownEditor';
 
 //for confirm dialog
 
@@ -336,11 +337,12 @@ function AddCommentModal({ open, handleOpen, handleClose, phoneModel, phoneId, s
 }
 
 function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActions }) {
+  const [content, setContent] = useState(phoneToUpdate?.content || '');
+
   const { mutateAsync } = usePut(`phone/updatephone?phoneId=${phoneToUpdate?._id}`, ['phonesData']);
 
   const defaultSchema = useMemo(() => {
     return {
-      description: phoneToUpdate.description,
       address: phoneToUpdate.address,
       status: phoneToUpdate.status,
     };
@@ -360,12 +362,15 @@ function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActi
 
   const onSubmit = async (data) => {
     let payload = {};
-    if (data.description) payload.description = data.description;
     if (data.address) payload.address = data.address;
     if (data.status) payload.status = data.status;
 
+    if (content.length) {
+      payload.content = content;
+    }
+
     try {
-      await mutateAsync(data);
+      await mutateAsync(payload);
       snackbarActions(
         `updated information of phone with imei ${phoneToUpdate?.imei}`,
         'success',
@@ -383,13 +388,10 @@ function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActi
       <MuiDialog open={open} handleOpen={handleOpen} handleClose={handleClose}>
         <Box component={'form'} onSubmit={handleEditSubmit(onSubmit)}>
           <Box sx={{ my: '1em', p: '1em' }}>
-            <ControlInput
-              mulitine={true}
-              control={editControl}
-              helperText={editErrors?.description ? editErrors.description.message : ''}
-              error={!!editErrors?.description}
-              label={'Description'}
-              name={'description'}
+            <MarkdownEditor
+              content={content}
+              setContent={setContent}
+              placeholder={'Start Editing'}
             />
           </Box>
           <Box sx={{ my: '1em' }}>
@@ -424,7 +426,7 @@ function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActi
 function PhoneCard({ phone }) {
   const { handleClose, handleOpen, open } = useDialog();
 
-  const theme = useTheme()
+  const theme = useTheme();
 
   const {
     handleClose: handleConfirmDialogClose,
@@ -498,10 +500,16 @@ function PhoneCard({ phone }) {
           {user?.email === phone?.owner?.email && (
             <Box>
               <ToolTip title={'update'}>
-                <Edit onClick={handleEditDialogOpen} sx={{color:theme?.palette?.primary?.main}} />
+                <Edit
+                  onClick={handleEditDialogOpen}
+                  sx={{ color: theme?.palette?.primary?.main }}
+                />
               </ToolTip>
               <ToolTip title={'delete'}>
-                <DeleteForever onClick={handleConfirmDialogOpen} sx={{color:theme?.palette?.primary?.main}} />
+                <DeleteForever
+                  onClick={handleConfirmDialogOpen}
+                  sx={{ color: theme?.palette?.primary?.main }}
+                />
               </ToolTip>
             </Box>
           )}
@@ -523,7 +531,7 @@ function PhoneCard({ phone }) {
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <ToolTip title={'comments'}>
             <Badge badgeContent={phone?.comments?.length} color="primary">
-              <CommentBank onClick={handleOpen} sx={{color:theme?.palette?.primary?.main}}/>
+              <CommentBank onClick={handleOpen} sx={{ color: theme?.palette?.primary?.main }} />
             </Badge>
           </ToolTip>
         </Box>
