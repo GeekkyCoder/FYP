@@ -7,6 +7,8 @@ import {
   DialogTitle,
   DialogContent,
   IconButton,
+  Badge,
+  useTheme
 } from '@mui/material';
 import {
   CommentBank,
@@ -370,7 +372,7 @@ function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActi
         true
       );
       handleClose();
-      editReset()
+      editReset();
     } catch (err) {
       snackbarActions(err?.msg, 'error', true);
     }
@@ -421,6 +423,8 @@ function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActi
 
 function PhoneCard({ phone }) {
   const { handleClose, handleOpen, open } = useDialog();
+
+  const theme = useTheme()
 
   const {
     handleClose: handleConfirmDialogClose,
@@ -494,10 +498,10 @@ function PhoneCard({ phone }) {
           {user?.email === phone?.owner?.email && (
             <Box>
               <ToolTip title={'update'}>
-                <Edit onClick={handleEditDialogOpen} />
+                <Edit onClick={handleEditDialogOpen} sx={{color:theme?.palette?.primary?.main}} />
               </ToolTip>
               <ToolTip title={'delete'}>
-                <DeleteForever onClick={handleConfirmDialogOpen} />
+                <DeleteForever onClick={handleConfirmDialogOpen} sx={{color:theme?.palette?.primary?.main}} />
               </ToolTip>
             </Box>
           )}
@@ -518,7 +522,9 @@ function PhoneCard({ phone }) {
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <ToolTip title={'comments'}>
-            <CommentBank onClick={handleOpen} />
+            <Badge badgeContent={phone?.comments?.length} color="primary">
+              <CommentBank onClick={handleOpen} sx={{color:theme?.palette?.primary?.main}}/>
+            </Badge>
           </ToolTip>
         </Box>
         <CommentModel
@@ -584,23 +590,7 @@ function PhoneCard({ phone }) {
             Address: {phone?.address}
           </Typography>
         </Box>
-
-        <Box>
-          <Typography
-            component={'div'}
-            variant={'body2'}
-            sx={{ fontSize: '1.5rem', fontWeight: '600', color: grey['600'] }}
-          >
-            Mobile Description:
-          </Typography>
-          <Typography
-            component={'div'}
-            variant={'p'}
-            sx={{ fontSize: '1rem', fontWeight: '300', color: grey['800'] }}
-          >
-            {phone?.description}
-          </Typography>
-        </Box>
+        {phone.content && <div dangerouslySetInnerHTML={{ __html: phone?.content }} />}
       </Card>
     </>
   );

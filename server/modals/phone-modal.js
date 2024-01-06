@@ -20,6 +20,10 @@ const phoneSchema = new mongoose.Schema(
       enum: ['stolen', 'recovered'],
       default: 'stolen',
     },
+    content: {
+      type: String,
+      required: true,
+    },
     address: {
       type: String,
       required: true,
@@ -55,15 +59,10 @@ const phoneSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
-    description: {
-      type: String,
-      default: '',
-      required: true,
-    },
     comments: {
       type: [Object],
       default: [],
-      ref:"Comment"
+      ref: 'Comment',
     },
   },
   { timestamps: true }

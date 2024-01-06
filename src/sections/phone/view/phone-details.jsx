@@ -13,6 +13,7 @@ import { SaveAsRounded } from '@mui/icons-material';
 import { usePost } from 'src/hooks/useRequest';
 import MapComponent from './Map';
 import { InputLabel } from '@mui/material';
+import MarkdownEditor from 'src/components/MarkdownEditor/MarkdownEditor';
 
 const cloudName = 'dczhcauwf';
 const preset = 'lfueeeon';
@@ -23,14 +24,12 @@ const defaultPhoneForm = {
   brand: 'samsung',
   model: '',
   imei: '',
-  description: '',
 };
 
 const phoneSchema = yup.object().shape({
   brand: yup.string().oneOf(['samsung', 'motorolla', 'xiomi', 'iphone', 'realme']).required(),
   model: yup.string().required(),
   imei: yup.string().min(15).max(15).required(),
-  description: yup.string().min(30).max(1200).required(),
 });
 
 function PhoneDetails({ snackbarActions }) {
@@ -38,6 +37,7 @@ function PhoneDetails({ snackbarActions }) {
   const [imageUrls, setImageUrls] = useState([]);
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState('');
+  const [content, setContent] = useState('');
 
   const { mutateAsync, isLoading } = usePost('phone/add/new-entry', ['phonesData']);
 
@@ -109,20 +109,24 @@ function PhoneDetails({ snackbarActions }) {
   };
 
   const onSubmit = async (data) => {
-    if (!imageUrls?.length) {
-      alert('please provide atleast one picture of your mobile phone');
+    if (imageUrls?.length < 2) {
+      alert('please provide atleast two picture of your mobile phone');
       return;
     }
 
-    
     if (!address?.length) {
       snackbarActions('address field is required', 'error', true);
       return;
     }
 
+    if (!content.length) {
+      snackbarActions('please write something about your phone in the editor', 'error', true);
+    }
+
     const payload = {
       ...data,
       address,
+      content,
       images: imageUrls,
     };
 
@@ -132,7 +136,8 @@ function PhoneDetails({ snackbarActions }) {
       reset();
       setImages([]);
       setImageUrls([]);
-      setAddress("")
+      setAddress('');
+      setContent('');
     } catch (err) {
       snackbarActions(err?.message, 'error', true);
     }
@@ -218,7 +223,7 @@ function PhoneDetails({ snackbarActions }) {
                 <Button
                   loading={loading}
                   type={'button'}
-                  disabled={!images?.length}
+                  disabled={images?.length < 2}
                   variant={'outlined'}
                   onClickHandler={handleImageSubmit}
                   sx={{ width: '45%' }}
@@ -248,20 +253,8 @@ function PhoneDetails({ snackbarActions }) {
               placeholder="Address "
             />
           </Box>
-          <Box sx={{ gridColumn: '1/-1' }}>
-            <ControlInput
-              control={control}
-              mulitine={true}
-              type={'text'}
-              name={'description'}
-              helperText={
-                touchedFields?.description && errors?.description
-                  ? errors?.description?.message
-                  : ''
-              }
-              error={touchedFields?.description && !!errors?.description}
-              fullWidth={true}
-            />
+          <Box sx={{ gridColumn: '1/-1', mb: '2em' }}>
+            <MarkdownEditor content={content} setContent={setContent} />
           </Box>
           <Box
             sx={{

@@ -6,9 +6,9 @@ const User = require('../modals/user.modal');
 const checkPermission = require('../middlewares/check-auth');
 
 async function addNewPhoneEntry(req, res) {
-  const { imei, brand, model, description, address } = req.body;
+  const { imei, brand, model, content, address } = req.body;
 
-  if ((!imei || !brand, !model, !description || !address)) {
+  if ((!imei || !brand, !model|| !address || !content)) {
     return errorResponse(res, 400, 'please provide field values');
   }
 

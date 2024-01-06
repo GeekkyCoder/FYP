@@ -435,6 +435,7 @@ export default function PhoneView() {
         />
 
         <PhoneCards />
+
       </>
     </>
   );
