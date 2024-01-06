@@ -31,7 +31,7 @@ app.use('/user', userRouter);
 app.use('/phone', phoneRouter);
 app.use('/comment', commentRouter);
 
-app.use('/', (req, res) => {
+app.use('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '..', './dist/index.html'));
 });
 
