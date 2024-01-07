@@ -34,6 +34,7 @@ export const putData = async (endpoint, data) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
+      credentials: "include",
     });
     if (!response.ok) throw new Error('something went wrong');
     return response.json();
