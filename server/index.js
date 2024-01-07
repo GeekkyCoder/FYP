@@ -35,9 +35,9 @@ app.use('/comment', commentRouter);
 //   res.sendFile(path.resolve(__dirname, './public/dist/index.html'));
 // });
 
-// app.get('/', (req, res) => {
-//   res.send('hello world');
-// });
+app.get('/', (req, res) => {
+  res.send('hello world');
+});
 
 startServer();
 
