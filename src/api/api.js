@@ -1,4 +1,7 @@
-const BASE_URL = 'http://localhost:8000';
+// const BASE_URL = 'http://localhost:8000';
+
+const BASE_URL = 'https://tracking-system-for-cellphones.vercel.app';
+
 import axios from 'axios';
 
 export const fetchData = async (endpoint) => {

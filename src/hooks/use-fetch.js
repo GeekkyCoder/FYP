@@ -1,5 +1,7 @@
 import axios from 'axios';
-const BASE_URL = 'http://localhost:8000';
+// const BASE_URL = 'http://localhost:8000';
+
+const BASE_URL = 'https://tracking-system-for-cellphones.vercel.app';
 
 const useFetch = () => {
   const postRequest = async (url, payload, options = 'application/json') => {

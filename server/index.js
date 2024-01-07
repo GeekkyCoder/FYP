@@ -20,12 +20,24 @@ const mongo_url = process.env.MONGO_URL;
 app.set('trust proxy', 1);
 app.use(express.json());
 app.use(cookieParser(process.env.ACCESS_TOKEN));
+
+//development
+// app.use(
+//   cors({
+//     origin: 'http://localhost:5173',
+//     credentials: true,
+//   })
+// );
+
+//production
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://tracking-system-stolen-cellphones.vercel.app',
     credentials: true,
   })
 );
+
+
 
 app.use('/user', userRouter);
 app.use('/phone', phoneRouter);
