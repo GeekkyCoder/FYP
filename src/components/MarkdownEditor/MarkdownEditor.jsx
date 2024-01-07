@@ -7,9 +7,12 @@ const MarkdownEditor = ({ placeholder, setContent, content }) => {
   const config = useMemo(() => {
     return {
       readonly: false, // all options from https://xdsoft.net/jodit/docs/,
-      placeholder: placeholder || 'Start typings...',
-      allowResizeYallowResizeY:true,
-
+      placeholder: placeholder || 'Start typing about your phone...',
+      allowResizeYallowResizeY: true,
+      uploader: {
+        insertImageAsBase64URI: false,
+        url: false,
+      },
     };
   }, [placeholder]);
 
