@@ -16,7 +16,7 @@ const attachCookiesToResponse = async (res, tokenUser,user) => {
     expires: new Date(Date.now() + ONE_YEAR),
     secure: process.env.NODE_ENV === 'production',
     signed: true,
-    // sameSite:"none"
+    sameSite:"none"
   });
    
   res.status(200).json({user})
