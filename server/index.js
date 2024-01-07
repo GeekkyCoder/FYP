@@ -32,12 +32,10 @@ app.use(cookieParser(process.env.ACCESS_TOKEN));
 //production
 app.use(
   cors({
-    origin: 'https://tracking-system-stolen-cellphones.vercel.app',
+    origin: 'https://fyp-theta-seven.vercel.app',
     credentials: true,
   })
 );
-
-
 
 app.use('/user', userRouter);
 app.use('/phone', phoneRouter);
