@@ -14,7 +14,7 @@ const app = express();
 const host = process.env.HOST;
 const mongo_url = process.env.MONGO_URL;
 
-app.use(express.static(path.resolve(__dirname, '..', 'dist')));
+app.use(express.static(path.resolve(__dirname, './public', 'dist')));
 
 //middlewares
 app.set('trust proxy', 1);
@@ -32,7 +32,7 @@ app.use('/phone', phoneRouter);
 app.use('/comment', commentRouter);
 
 app.use('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '..', './dist/index.html'));
+  res.sendFile(path.resolve(__dirname, './public/dist/index.html'));
 });
 
 // app.get('/', (req, res) => {
