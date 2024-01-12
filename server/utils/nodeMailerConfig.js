@@ -1,10 +1,11 @@
-require("dotenv").config()
+require('dotenv').config();
 
 module.exports = {
-    service: "gmail",
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD,
-      },
-    };
-    
+  service: process.env.SERVICE,
+  port: process.env.HOST_PORT,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
+  },
+};
