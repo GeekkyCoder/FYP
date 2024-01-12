@@ -71,7 +71,8 @@ export default function LoginView() {
   const [isloading, setIsLoading] = useState(false);
 
   const { setUser } = useAuth();
-  const {alertSeverity,handleSnackbarClose,snackbarActions,snackbarMessage,snackbarOpen} = useSnackbar()
+  const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
+    useSnackbar();
 
   const {
     control: loginControl,
@@ -112,10 +113,10 @@ export default function LoginView() {
       localStorage.setItem('user', JSON.stringify(user));
       router.push('/');
       loginReset();
-      snackbarActions("logged in successfully","success",true)
+      snackbarActions('logged in successfully', 'success', true);
     } catch (err) {
-      console.log(err)
-      snackbarActions(err?.message,"error",true)
+      console.log(err);
+      snackbarActions(err?.message, 'error', true);
       console.log(err);
     }
   };
@@ -134,11 +135,11 @@ export default function LoginView() {
 
     try {
       await postRequest('user/auth/register', payload);
-      signupReset()
+      signupReset();
       setIsLoading(false);
-      snackbarActions("registered successfully","success",true)
+      snackbarActions('registered successfully', 'success', true);
     } catch (err) {
-      snackbarActions(err?.message,"error",true)
+      snackbarActions(err?.message, 'error', true);
       setIsLoading(false);
       console.log(err);
     }
@@ -148,8 +149,12 @@ export default function LoginView() {
     setPage(page);
   };
 
+  const navigateToHome = () => {
+    router.push('/landing-page');
+  };
+
   const handleImageChange = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (e?.target?.files[0]) {
       setImage(e.target.files[0]);
     }
@@ -249,7 +254,11 @@ export default function LoginView() {
             <Typography component={'div'} variant={'p'}>
               Profile picture
             </Typography>
-          {image &&  <Typography component={'span'} variant={'p'}>{image?.name}</Typography>}
+            {image && (
+              <Typography component={'span'} variant={'p'}>
+                {image?.name}
+              </Typography>
+            )}
             <TextField accept="image/*" type="file" onChange={handleImageChange} />
           </Stack>
         </Stack>
@@ -262,104 +271,120 @@ export default function LoginView() {
   };
 
   return (
-     <>
-     <Alert alertSeverity={alertSeverity} handleSnackbarClose={handleSnackbarClose} snackbarMessage={snackbarMessage} snackbarOpen={snackbarOpen} />
-    <Box
-      sx={{
-        ...bgGradient({
-          color: alpha(theme.palette.background.default, 0.9),
-          imgUrl: '/assets/background/overlay_4.jpg',
-        }),
-        // height: 1,
-      }}
-    >
-      <Logo
-        sx={{
-          position: 'fixed',
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
+    <>
+      <Alert
+        alertSeverity={alertSeverity}
+        handleSnackbarClose={handleSnackbarClose}
+        snackbarMessage={snackbarMessage}
+        snackbarOpen={snackbarOpen}
       />
-
-      <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
-        <Card
+      <Box
+        sx={{
+          ...bgGradient({
+            color: alpha(theme.palette.background.default, 0.9),
+            imgUrl: '/assets/background/overlay_4.jpg',
+          }),
+          // height: 1,
+        }}
+      >
+        <Logo
           sx={{
-            p: 5,
-            width: 1,
-            maxWidth: 420,
+            position: 'fixed',
+            top: { xs: 16, md: 24 },
+            left: { xs: 16, md: 24 },
           }}
-        >
-          <Typography variant="h4">{page === 'login' ? 'Signin' : 'Signup'}</Typography>
+        />
 
-          <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            {page === 'login' ? 'Don’t have an account?' : 'have an account ?'}
-            {page === 'login' ? (
-              <Link onClick={() => togglePage('signup')} variant="subtitle2" sx={{ ml: 0.5 }}>
-                Get Started
-              </Link>
-            ) : (
-              <Link onClick={() => togglePage('login')} variant="subtitle2" sx={{ ml: 0.5 }}>
-                Log in
-              </Link>
-            )}
-          </Typography>
+        <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
+          <Card
+            sx={{
+              p: 5,
+              width: 1,
+              maxWidth: 420,
+            }}
+          >
+            <Typography variant="h4">{page === 'login' ? 'Signin' : 'Signup'}</Typography>
 
-          <Stack direction="row" spacing={2}>
-            <Button
-              type={'button'}
-              fullWidth={true}
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16), color: 'inherit' }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
-            </Button>
+            <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
+              {page === 'login' ? 'Don’t have an account?' : 'have an account ?'}
+              {page === 'login' ? (
+                <>
+                  <Link onClick={() => togglePage('signup')} variant="subtitle2" sx={{ ml: 0.5 }}>
+                    Sign up
+                  </Link>
 
-            <Button
-              type={'button'}
-              fullWidth={true}
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16), color: 'inherit' }}
-            >
-              <Iconify icon="eva:facebook-fill" color="#1877F2" />
-            </Button>
-
-            <Button
-              fullWidth={true}
-              variant="outlined"
-              type={'button'}
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16), color: 'inherit' }}
-            >
-              <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-            </Button>
-          </Stack>
-
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              OR
+                  <Link onClick={navigateToHome} variant="subtitle2" sx={{ ml: '1em' }}>
+                    Home
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link onClick={() => togglePage('login')} variant="subtitle2" sx={{ ml: 0.5 }}>
+                    Log in
+                  </Link>
+                  <Link onClick={navigateToHome} variant="subtitle2" sx={{ ml: '1em' }}>
+                    Home
+                  </Link>
+                </>
+              )}
             </Typography>
-          </Divider>
 
-          {page === 'login' && (
-            <RenderLoginForm
-              control={loginControl}
-              errors={loginErrors}
-              submitHandler={loginSubmit}
-              handleLogin={handleLogin}
-            />
-          )}
-          {page === 'signup' && (
-            <RenderSignUpForm
-              control={signupControl}
-              errors={signupErrors}
-              submitHandler={signupSubmit}
-              handleImageChange={handleImageChange}
-              handleSignUp={handleSignUp}
-              isloading={isloading}
-            />
-          )}
-        </Card>
-      </Stack>
-    </Box>
-  </>
+            <Stack direction="row" spacing={2}>
+              <Button
+                type={'button'}
+                fullWidth={true}
+                variant="outlined"
+                sx={{ borderColor: alpha(theme.palette.grey[500], 0.16), color: 'inherit' }}
+              >
+                <Iconify icon="eva:google-fill" color="#DF3E30" />
+              </Button>
+
+              <Button
+                type={'button'}
+                fullWidth={true}
+                variant="outlined"
+                sx={{ borderColor: alpha(theme.palette.grey[500], 0.16), color: 'inherit' }}
+              >
+                <Iconify icon="eva:facebook-fill" color="#1877F2" />
+              </Button>
+
+              <Button
+                fullWidth={true}
+                variant="outlined"
+                type={'button'}
+                sx={{ borderColor: alpha(theme.palette.grey[500], 0.16), color: 'inherit' }}
+              >
+                <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
+              </Button>
+            </Stack>
+
+            <Divider sx={{ my: 3 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                OR
+              </Typography>
+            </Divider>
+
+            {page === 'login' && (
+              <RenderLoginForm
+                control={loginControl}
+                errors={loginErrors}
+                submitHandler={loginSubmit}
+                handleLogin={handleLogin}
+              />
+            )}
+            {page === 'signup' && (
+              <RenderSignUpForm
+                control={signupControl}
+                errors={signupErrors}
+                submitHandler={signupSubmit}
+                handleImageChange={handleImageChange}
+                handleSignUp={handleSignUp}
+                isloading={isloading}
+              />
+            )}
+          </Card>
+        </Stack>
+      </Box>
+    </>
   );
 }

@@ -19,6 +19,7 @@ function ControlInput({
   mulitine,
   label,
   icon,
+  sx
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -28,7 +29,7 @@ function ControlInput({
     <>
       {type !== 'password' ? (
         <Box>
-          <InputLabel shrink htmlFor={name}>
+          <InputLabel shrink htmlFor={name} sx={{color:name==="Email" || name === "Message" ? "white" : "" }}>
             {name.toUpperCase()}
           </InputLabel>
           <Controller
@@ -37,7 +38,7 @@ function ControlInput({
             rules={{ required: true }}
             render={({ field }) => (
               <TextField
-                sx={{ width: '100%'}}
+              sx={{...sx,width:"100%"}}
                 fullWidth={fullWidth}
                 {...field}
                 name={name}
@@ -70,11 +71,11 @@ function ControlInput({
             rules={{ required: true }}
             render={({ field }) => (
               <TextField
-                sx={{ width: '100%' }}
                 fullWidth={fullWidth}
                 {...field}
                 name={name}
                 placeholder={name}
+                sx={{...sx,width:"100%"}}
                 label={label}
                 type={(type = showPassword ? 'text' : 'password')}
                 variant="outlined"

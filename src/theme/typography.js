@@ -22,16 +22,16 @@ export function responsiveFontSizes({ sm, md, lg }) {
   };
 }
 
-export const primaryFont = 'Public Sans, sans-serif';
-export const secondaryFont = 'Barlow, sans-serif';
+export const primaryFont = 'Roboto Condensed, sans-serif';
+export const secondaryFont = 'Poppins, sans-serif';
 
 // ----------------------------------------------------------------------
 
 export const typography = {
   fontFamily: primaryFont,
   fontSecondaryFamily: secondaryFont,
-  fontWeightRegular: 400,
-  fontWeightMedium: 500,
+  fontWeightRegular: 100,
+  fontWeightMedium: 300,
   fontWeightSemiBold: 600,
   fontWeightBold: 700,
   h1: {

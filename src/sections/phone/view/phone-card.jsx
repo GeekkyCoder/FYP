@@ -570,6 +570,15 @@ function PhoneCard({ phone }) {
           >
             Model: {phone?.model}
           </Typography>
+
+          <Typography
+            component={'div'}
+            variant={'body1'}
+            gutterBottom={true}
+            sx={{ fontSize: 'inherit' }}
+          >
+            IMEI: {phone?.imei}
+          </Typography>
           <Typography
             component={'div'}
             variant={'body1'}

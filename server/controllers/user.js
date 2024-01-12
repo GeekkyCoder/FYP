@@ -4,6 +4,8 @@ const { errorResponse } = require('../utils/errResponse');
 const bcrypt = require('bcryptjs');
 const attachCookiesToResponse = require('../utils/attachCookiesToResponse');
 const checkPermission = require('../middlewares/check-auth');
+const sendVerificationEmail = require('../utils/sendVerificationEmail');
+const sendEmail = require('../utils/sendEmail');
 
 const register = async (req, res) => {
   const { userName, email, password, confirmPassword, profilePicture } = req.body;
@@ -38,7 +40,34 @@ const register = async (req, res) => {
     email: user?.email,
   };
 
+  // let origin = "http://localhost:5173"
+  let origin = "https://fyp-theta-seven.vercel.app"
+
+  await sendVerificationEmail({
+    name: userFound.userName,
+    email: userFound.email,
+    origin,
+  });
+
   attachCookiesToResponse(res, tokenUser, userFound);
+};
+
+const verifyEmail = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return errorResponse(res, 401, 'user does not exist');
+  }
+
+  if (user.isVerified) {
+    return errorResponse(res, 401, 'account already verified');
+  }
+
+  await User.findOneAndUpdate({ email }, { isVerified: true }, { upsert: true });
+
+  return res.status(200).json({ status: 200, msg: 'account verified!!' });
 };
 
 const login = async (req, res) => {
@@ -52,6 +81,10 @@ const login = async (req, res) => {
 
   if (!userFound) {
     return errorResponse(res, 401, 'account does not exist');
+  }
+
+  if (!userFound.isVerified) {
+    return errorResponse(res, 404, 'please verify your email');
   }
 
   const isPasswordMatch = await bcrypt.compare(password, userFound?.password);
@@ -153,6 +186,30 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getUserFeedBack = async (req, res) => {
+  const { Email, Message } = req.body;
+
+  const user = await User.findOne({email:Email})
+
+  if(!user) {
+    return errorResponse(res,404,"please create your account first")
+  }
+
+  if (!Email.length || !Message.length) {
+    return errorResponse(res, 404, 'please provdide email and message');
+  }
+
+  //send email
+  const message = ` <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+   <h2>Feeback from User</h2>
+   <p>${Message}</p>
+ </div>`;
+
+  await sendEmail(
+    { html: message, subject: 'Feedback from user', to: 'readerblogs123@gmail.com',from:{email:Email} }
+  );
+};
+
 module.exports = {
   register,
   login,
@@ -161,4 +218,6 @@ module.exports = {
   getCurrentUser,
   getAllUsers,
   deleteUser,
+  verifyEmail,
+  getUserFeedBack
 };

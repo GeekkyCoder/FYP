@@ -30,9 +30,10 @@ export default function UserTableRow({
   status,
   handleClick,
   row,
+  setIsUserDeleted,
 }) {
   const [open, setOpen] = useState(null);
-  const [deleted, setDeleted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
     useSnackbar();
@@ -46,14 +47,16 @@ export default function UserTableRow({
   };
 
   const handleDelete = async (rowId) => {
-    setDeleted(true);
+    setLoading(true);
     try {
       await useFetch().deleteRequest(`user/delete-user?id=${rowId}`);
-      setDeleted(false);
+      setIsUserDeleted(true);
+      setLoading(false);
       snackbarActions('account deleted', 'success', true);
     } catch (err) {
+      setIsUserDeleted(false);
+      setLoading(false);
       snackbarActions(err?.message, 'error', true);
-      setDeleted(false);
     }
   };
 
@@ -105,14 +108,9 @@ export default function UserTableRow({
           sx: { width: 140 },
         }}
       >
-        <MenuItem onClick={handleCloseMenu}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
-
         <MenuItem onClick={() => handleDelete(id)}>
           <Iconify icon="material-symbols-light:delete-outline" sx={{ mr: 2, color: 'red' }} />
-          {!deleted ? 'Delete' : <Spinner />}
+          {!loading ? 'Delete' : <Spinner />}
         </MenuItem>
       </Popover>
     </>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -21,16 +21,13 @@ import UserTableHead from '../user-table-head';
 import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-import { useGet } from 'src/hooks/useRequest';
+import useFetch from 'src/hooks/use-fetch';
 
 // ----------------------------------------------------------------------
 
 export default function UserPage() {
-  const {
-    data: users,
-    isLoading: usersLoading,
-    error: userError,
-  } = useGet('user/all-users', 'users');
+  const [users, setUsers] = useState([]);
+  const [isUserDeleted, setIsUserDeleted] = useState(false);
 
   const [page, setPage] = useState(0);
 
@@ -79,7 +76,6 @@ export default function UserPage() {
     setSelected(newSelected);
   };
 
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -95,13 +91,26 @@ export default function UserPage() {
   };
 
   const dataFiltered = applyFilter({
-    inputData: !users ? [] : users?.users,
+    inputData: !users.length ? [] : users,
     comparator: getComparator(order, orderBy),
     filterName,
   });
 
   const notFound = dataFiltered && !dataFiltered.length && !!filterName;
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const users = await useFetch().getRequest('user/all-users');
+        setUsers(users?.users)
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchUsers();
+  }, [isUserDeleted]);
+
+  console.log(users);
 
   return (
     <Container>
@@ -150,6 +159,7 @@ export default function UserPage() {
                         selected={selected.indexOf(row.userName) !== -1}
                         handleClick={handleClick}
                         row={row}
+                        setIsUserDeleted={setIsUserDeleted}
                       />
                     ))}
 

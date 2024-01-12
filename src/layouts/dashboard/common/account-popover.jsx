@@ -30,6 +30,7 @@ import useSnackbar from 'src/hooks/use-snackbar';
 import { useRouter } from 'src/routes/hooks';
 import { useGet } from 'src/hooks/useRequest';
 import PhoneCard from 'src/sections/phone/view/phone-card';
+import { useNavigate } from 'react-router-dom';
 
 const defaultUpdateUserForm = {
   UserName: '',
@@ -68,6 +69,7 @@ const updateUserSchema = yup.object().shape({
 export default function AccountPopover() {
   const [image, setImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate()
 
   const {
     data: userPhones,
@@ -124,10 +126,11 @@ export default function AccountPopover() {
 
   const handleLogOut = async () => {
     try {
-      await deleteRequest('auth/log-out');
+      await deleteRequest('user/auth/log-out');
       localStorage.clear();
       setUser(null);
       handleClose();
+      navigate("/landing-page")
       window.location.reload();
     } catch (err) {
       console.log(err);

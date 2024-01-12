@@ -5,7 +5,7 @@ export default function LoginPage() {
   return (
     <>
       <Helmet>
-        <title> Phone </title>
+        <title> Phone-Tracker -Phone  </title>
       </Helmet>
 
       <PhoneView />
