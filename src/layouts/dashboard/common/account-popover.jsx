@@ -131,7 +131,6 @@ export default function AccountPopover() {
       setUser(null);
       handleClose();
       navigate("/landing-page")
-      window.location.reload();
     } catch (err) {
       console.log(err);
     }
