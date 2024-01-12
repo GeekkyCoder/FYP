@@ -7,7 +7,7 @@ const sendEmail = async ({ to, subject, html, from }) => {
   const transporter = nodemailer.createTransport(nodemailerConfig);
 
   let fromUser = '';
-  if (from?.email?.length) {
+  if (from?.email) {
     fromUser = `'"Feeback"  <${from?.email}>'`;
   } else {
     fromUser = '"Phone Tracker" <readerblogs123@gmail.com>';
