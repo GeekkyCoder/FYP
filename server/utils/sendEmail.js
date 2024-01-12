@@ -8,7 +8,7 @@ const sendEmail = async ({ to, subject, html, from }) => {
 
   let fromUser = '';
   if (from?.email) {
-    fromUser = `'"Feeback"  <${from?.email}>'`;
+    fromUser = `"Feeback"  <${from?.email}>`;
   } else {
     fromUser = '"Phone Tracker" <readerblogs123@gmail.com>';
   }
