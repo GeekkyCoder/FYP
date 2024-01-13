@@ -11,7 +11,7 @@ const useProtectedRoute = () => {
 
   const ProtectedRoute = ({ element: Element, path }) => {
     // not working
-    return isAuthenticated() ? Element : <Navigate to={'/login'} />;
+    return isAuthenticated() ? Element : <Navigate to={'/landing-page'} />;
   };
 
   return {

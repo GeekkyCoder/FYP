@@ -4,13 +4,21 @@ const Phone = require('../modals/phone-modal');
 const Comment = require('../modals/comments.modal');
 const User = require('../modals/user.modal');
 const checkPermission = require('../middlewares/check-auth');
+const { checkImei } = require('../utils/checkImei');
+const { phoneInfo } = require('../utils/phoneInfo');
 
 async function addNewPhoneEntry(req, res) {
   const { imei, brand, model, content, address } = req.body;
 
-  if ((!imei || !brand, !model|| !address || !content)) {
+  if (!checkImei(imei)) {
+    return errorResponse(res, 404, 'please provide valid IMEI Number');
+  }
+
+  if ((!imei || !brand, !model || !address || !content)) {
     return errorResponse(res, 400, 'please provide field values');
   }
+
+  const { imeiCode, brandName, deviceName,modelName } = await phoneInfo(imei);
 
   const user = await User.findOne({ _id: req?.user?.userId });
 
@@ -22,6 +30,9 @@ async function addNewPhoneEntry(req, res) {
     //add new entry
     const phone = await Phone.create({
       ...req.body,
+      imei: imeiCode,
+      brand: brandName,
+      model: modelName ? modelName : deviceName ,
       owner: {
         userId: user?._id,
         name: user?.userName,

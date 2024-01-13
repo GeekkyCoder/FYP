@@ -21,14 +21,14 @@ const preset = 'lfueeeon';
 const brands = ['samsung', 'motorolla', 'xiomi', 'iphone', 'realme'];
 
 const defaultPhoneForm = {
-  brand: 'samsung',
-  model: '',
+  // brand: 'samsung',
+  // model: '',
   imei: '',
 };
 
 const phoneSchema = yup.object().shape({
-  brand: yup.string().oneOf(['samsung', 'motorolla', 'xiomi', 'iphone', 'realme']).required(),
-  model: yup.string().required(),
+  // brand: yup.string().oneOf(['samsung', 'motorolla', 'xiomi', 'iphone', 'realme']).required(),
+  // model: yup.string().required(),
   imei: yup.string().min(15).max(15).required(),
 });
 
@@ -109,11 +109,6 @@ function PhoneDetails({ snackbarActions }) {
   };
 
   const onSubmit = async (data) => {
-    if (imageUrls?.length < 2) {
-      alert('please provide atleast two picture of your mobile phone');
-      return;
-    }
-
     if (!address?.length) {
       snackbarActions('address field is required', 'error', true);
       return;
@@ -168,10 +163,10 @@ function PhoneDetails({ snackbarActions }) {
             width: '100%',
           }}
         >
-          <Box>
+          {/* <Box>
             <SelectComp control={control} name={'brand'} menuItems={brands} label={'Brand'} />
-          </Box>
-          <ControlInput
+          </Box> */}
+          {/* <ControlInput
             control={control}
             mulitine={true}
             type={'text'}
@@ -181,7 +176,7 @@ function PhoneDetails({ snackbarActions }) {
             }
             error={touchedFields?.modal && !!errors?.modal}
             fullWidth={true}
-          />
+          /> */}
           <Box sx={{ gridColumn: '1/-1' }}>
             <ControlInput
               control={control}
@@ -197,6 +192,11 @@ function PhoneDetails({ snackbarActions }) {
             />
           </Box>
           <Box gridColumn={'1/-1'}>
+            {images?.length === 1 && (
+              <Typography component={'div'} sx={{ my: '.7em' }}>
+                Upload At Least Two Images
+              </Typography>
+            )}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               {images?.map((img) => (
                 <Box sx={{ ml: '.5em' }}>{img?.name}</Box>

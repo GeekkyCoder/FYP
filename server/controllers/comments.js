@@ -4,6 +4,7 @@ const User = require('../modals/user.modal');
 const { errorResponse } = require('../utils/errResponse');
 const { StatusCodes } = require('http-status-codes');
 const mongoose = require('mongoose');
+const sendEmail = require('../utils/sendEmail');
 
 async function createComment(req, res) {
   const { comment } = req.body;
@@ -22,6 +23,30 @@ async function createComment(req, res) {
   }
 
   const phone = await Phone?.findOne({ _id: phoneId });
+
+  const userWhoPostedEmail = await User.findOne({ _id: phone.owner.userId });
+
+  // const origin = 'http://localhost:5173/phone';
+  const origin = "https://fyp-theta-seven.vercel.app/phone"
+
+  const html = ` <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+  <h2>New Comment On Your Post, Model:${phone?.model}</h2>
+  <p>Hello ${userWhoPostedEmail.userName},</p>
+  <p>${user.userName} has addded a comment on your post ${phone?.model}</p>
+  <p>${comment}</p>
+  <div style="text-align: center; margin-top: 20px;">
+      <a href="${origin}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: #fff; text-decoration: none;">View Here</a>
+  </div>
+  <p>Thank you</p>
+  <p>Hope You having a good day!!</p>
+</div>`;
+
+  await sendEmail({
+    subject: `Update On Your Post ${phone?.model}`,
+    to: userWhoPostedEmail.email,
+    from: { email: user?.email,hasComment:true },
+    html,
+  });
 
   if (!phone) {
     return errorResponse(res, 404, `could not find phone with id ${phone?._id}`);

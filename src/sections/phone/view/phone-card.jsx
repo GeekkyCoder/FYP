@@ -514,7 +514,7 @@ function PhoneCard({ phone }) {
             </Box>
           )}
         </Stack>
-        <Box sx={{ my: '1em', width: '100%' }}>
+        {phone?.images?.length > 0 && <Box sx={{ my: '1em', width: '100%' }}>
           <Slider {...settings}>
             {phone?.images?.map((img, idx) => (
               <div key={idx}>
@@ -526,7 +526,7 @@ function PhoneCard({ phone }) {
               </div>
             ))}
           </Slider>
-        </Box>
+        </Box>}
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <ToolTip title={'comments'}>

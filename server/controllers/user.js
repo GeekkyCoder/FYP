@@ -120,7 +120,7 @@ const logOut = async (req, res) => {
   res.cookie('token', 'logout', {
     httpOnly: true,
     expires: new Date(Date.now()),
-    sameSite:"none"
+    // sameSite:"none"
   });
 
   res.status(200).json('logged out successfully!');
@@ -154,7 +154,7 @@ const updateUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}).select('-password');
+    const users = await User.find({isVerified:true}).select('-password');
     res.status(StatusCodes.OK).json({ users });
   } catch (err) {
     res.status(500).json({ msg: 'failed to fetch users' });
@@ -206,7 +206,7 @@ const getUserFeedBack = async (req, res) => {
  </div>`;
 
   await sendEmail(
-    { html: message, subject: 'Feedback from user', to: 'readerblogs123@gmail.com',from:{email:Email} }
+    { html: message, subject: 'Feedback from user', to: 'farazahmedk955@gmail.com',from:{email:Email,hasComment:false} }
   );
 };
 

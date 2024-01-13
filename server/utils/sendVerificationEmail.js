@@ -24,7 +24,8 @@ const sendVerificationEmail = async ({
     subject: 'Email Confirmation',
     html: `${message}`,
     from:{
-        email:""
+        email:"",
+        hasComment:false
     }
   });
 };
