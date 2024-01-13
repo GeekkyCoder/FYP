@@ -1,7 +1,7 @@
 import axios from 'axios';
 // const BASE_URL = 'http://localhost:8000';
 
-const BASE_URL = 'https://phone-tracker-mu.vercel.app';
+const BASE_URL = 'https://phone-tracker-flame.vercel.app';
 
 const useFetch = () => {
   const postRequest = async (url, payload, options = 'application/json') => {

@@ -68,5 +68,5 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "vite": "^4.4.5"
   },
-  "proxy": "https://phone-tracker-mu.vercel.app"
+  "proxy": "https://phone-tracker-flame.vercel.app"
 }
