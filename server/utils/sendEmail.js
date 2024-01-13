@@ -10,7 +10,7 @@ const sendEmail = async ({ to, subject, html, from }) => {
   if (from?.email) {
     fromUser = `"Feeback"  <${from?.email}>`;
   } else {
-    fromUser = '"Phone Tracker" <readerblogs123@gmail.com>';
+    fromUser = '"Phone Tracker" <farazahmedk955@gmail.com>';
   }
 
   return transporter.sendMail({
