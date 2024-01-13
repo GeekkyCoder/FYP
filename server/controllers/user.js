@@ -120,7 +120,7 @@ const logOut = async (req, res) => {
   res.cookie('token', 'logout', {
     httpOnly: true,
     expires: new Date(Date.now()),
-    // sameSite:"none"
+    sameSite:"none"
   });
 
   res.status(200).json('logged out successfully!');
@@ -206,7 +206,7 @@ const getUserFeedBack = async (req, res) => {
  </div>`;
 
   await sendEmail(
-    { html: message, subject: 'Feedback from user', to: 'farazahmedk955@gmail.com',from:{email:Email,hasComment:false} }
+    { html: message, subject: 'Feedback from user', to: 'farazahmedk955@gmail.com',from:{email:user?.email,hasComment:false} }
   );
 };
 
