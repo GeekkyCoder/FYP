@@ -68,5 +68,5 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "vite": "^4.4.5"
   },
-  "proxy": "https://tracking-stolen-cellphones.vercel.app"
+  "proxy": "https://phone-tracker-mu.vercel.app"
 }
