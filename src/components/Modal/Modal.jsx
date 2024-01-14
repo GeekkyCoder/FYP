@@ -5,12 +5,12 @@ import Backdrop from '@mui/material/Backdrop';
 import Button from '../Button/Button';
 import { useSpring, animated } from '@react-spring/web';
 import { CloseOutlined } from '@mui/icons-material';
+import { useMediaQuery } from '@mui/material';
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 600,
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
@@ -44,6 +44,9 @@ const Fade = React.forwardRef(function Fade(props, ref) {
 });
 
 function ModalComp({ open, handleOpen, handleClose, children }) {
+
+  const sm = useMediaQuery('(min-width:800px)');
+
   return (
     <div>
       <Modal
@@ -61,7 +64,7 @@ function ModalComp({ open, handleOpen, handleClose, children }) {
         }}
       >
         <Fade in={open}>
-          <Box sx={style}>
+          <Box sx={{...style,width:`${sm ? 600 : '100%'}`}}>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
               <CloseOutlined fontSize="large" onClick={handleClose} />
             </Box>
