@@ -1,12 +1,15 @@
-import { DialogContent, DialogTitle, Divider } from '@mui/material';
+import { DialogContent, DialogTitle, Divider, useMediaQuery,Box } from '@mui/material';
+import { CloseOutlined } from '@mui/icons-material';
 import Dialog from '@mui/material/Dialog';
 
 function MuiDialog({ open, handleOpen, handleClose, maxWidth, children, fullScreen, dialogTitle }) {
+  const sm = useMediaQuery('(min-width:800px)');
+
   return (
     <div>
       <Dialog
         open={open}
-        fullScreen={fullScreen}
+        fullScreen={!sm ? true : fullScreen}
         maxWidth={maxWidth}
         fullWidth={true}
         onClose={handleClose}
@@ -19,6 +22,9 @@ function MuiDialog({ open, handleOpen, handleClose, maxWidth, children, fullScre
       >
         <DialogTitle>{dialogTitle}</DialogTitle>
         <Divider />
+        {!sm && <Box sx={{ display: 'flex', justifyContent: 'flex-end', aignItems: 'center', p: '1em' }}>
+          <CloseOutlined onClick={handleClose} fontSize="large" />
+        </Box>}
         <DialogContent>{children}</DialogContent>
       </Dialog>
     </div>
