@@ -10,6 +10,7 @@ import {
   CardActions,
   Collapse,
   IconButton,
+  useMediaQuery,
 } from '@mui/material';
 import { blueGrey, grey, red } from '@mui/material/colors';
 import Button from 'src/components/Button/Button';
@@ -78,12 +79,12 @@ function StatusCard({ statusPhone }) {
             title={statusPhone?.phone?.model}
             subheader={localeDate(statusPhone?.phone?.createdAt)}
           />
-          <CardMedia
+        {statusPhone?.phone?.images[0] &&  <CardMedia
             component="img"
             height="194"
             image={statusPhone?.phone?.images[0]}
             alt="Paella dish"
-          />
+          />}
           <CardContent>
             <Typography variant="body2" color="text.secondary">
               {statusPhone?.phone?.description}
@@ -321,6 +322,8 @@ function StatusModel({
 export default function PhoneView() {
   const [statusPhone, setStatusPhone] = useState(null);
 
+  const sm = useMediaQuery('(min-width:800px)');
+
   const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
     useSnackbar();
 
@@ -379,7 +382,7 @@ export default function PhoneView() {
             <Typography
               component={'div'}
               variant={'p'}
-              sx={{ fontSize: '2rem', fontWeight: '800', color: '#ffff' }}
+              sx={{ fontSize: `${sm ? '2rem' : '1.5rem'}`, fontWeight: '800', color: '#ffff' }}
             >
               We Got You Covered
             </Typography>
@@ -400,7 +403,12 @@ export default function PhoneView() {
           </Typography>
         </MuiCard>
 
-        <Stack direction={'row'} alignItems={'center'} spacing={2} sx={{ my: '2em' }}>
+        <Stack
+          direction={`${sm ? 'row' : 'column'}`}
+          alignItems={`${sm ? 'center' : 'flex-start'}`}
+          spacing={2}
+          sx={{ my: '2em' }}
+        >
           <Button
             type={'button'}
             variant={'contained'}
@@ -410,7 +418,12 @@ export default function PhoneView() {
             Add Phone Details
           </Button>
 
-          <Button onClickHandler={handleStatusModalOpen} variant={'contained'} type={'button'}>
+          <Button
+            sx={{ width: `${!sm && '300px'}` }}
+            onClickHandler={handleStatusModalOpen}
+            variant={'contained'}
+            type={'button'}
+          >
             Check Status Of Phone
           </Button>
         </Stack>
@@ -435,7 +448,6 @@ export default function PhoneView() {
         />
 
         <PhoneCards />
-
       </>
     </>
   );

@@ -24,6 +24,8 @@ import useFetch from 'src/hooks/use-fetch';
 import useCloudinary from 'src/hooks/use-cloudinary';
 import useSnackbar from 'src/hooks/use-snackbar';
 import Alert from 'src/components/Alert/Alert';
+import useModal from 'src/hooks/use-modal';
+import ForgotPassword from 'src/pages/forgot-password';
 // import { SignupView } from '../signup/signup-view';
 
 // ----------------------------------------------------------------------
@@ -69,6 +71,9 @@ export default function LoginView() {
   const { postRequest } = useFetch();
   const { uploadImageToCloudinary } = useCloudinary();
   const [isloading, setIsLoading] = useState(false);
+
+  const {handleClose,handleOpen,open} = useModal()
+
 
   const { setUser } = useAuth();
   const { alertSeverity, handleSnackbarClose, snackbarActions, snackbarMessage, snackbarOpen } =
@@ -160,7 +165,7 @@ export default function LoginView() {
     }
   };
 
-  const RenderLoginForm = ({ control, errors, submitHandler, handleLogin }) => (
+  const RenderLoginForm = ({ control, errors, submitHandler, handleLogin,handleForgotPassword }) => (
     <Box component={'form'} onSubmit={submitHandler(handleLogin)}>
       <Stack spacing={3}>
         <ControlInput
@@ -186,7 +191,7 @@ export default function LoginView() {
       </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="flex-end" sx={{ my: 3 }}>
-        <Link variant="subtitle2" underline="hover">
+        <Link variant="subtitle2" underline="hover" onClick={handleForgotPassword}>
           Forgot password?
         </Link>
       </Stack>
@@ -272,6 +277,7 @@ export default function LoginView() {
 
   return (
     <>
+    <ForgotPassword open={open} handleClose={handleClose} handleOpen={handleOpen}/>
       <Alert
         alertSeverity={alertSeverity}
         handleSnackbarClose={handleSnackbarClose}
@@ -370,6 +376,7 @@ export default function LoginView() {
                 errors={loginErrors}
                 submitHandler={loginSubmit}
                 handleLogin={handleLogin}
+                handleForgotPassword={handleOpen}
               />
             )}
             {page === 'signup' && (

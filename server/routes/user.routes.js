@@ -10,6 +10,9 @@ const {
   deleteUser,
   verifyEmail,
   getUserFeedBack,
+  forgotPassword,
+  resetPassword,
+  getTotalUsersLength,
 } = require('../controllers/user');
 
 const userRouter = require('express').Router();
@@ -23,7 +26,9 @@ userRouter.get('/all-users', getAllUsers);
 userRouter.delete('/delete-user', [authMiddleware, authorize('admin')], deleteUser);
 userRouter.post('/auth/verify-email', authMiddleware, verifyEmail);
 userRouter.post('/feedback', authMiddleware, getUserFeedBack);
-
+userRouter.post('/forget-password', forgotPassword);
+userRouter.post('/reset-password', resetPassword);
+userRouter.get("/total-users", getTotalUsersLength)
 module.exports = {
   userRouter,
 };

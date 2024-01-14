@@ -25,7 +25,8 @@ const sendVerificationEmail = async ({
     html: `${message}`,
     from:{
         email:"",
-        hasComment:false
+        hasComment:false,
+        resetPassword:false
     }
   });
 };

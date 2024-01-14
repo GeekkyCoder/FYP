@@ -12,13 +12,13 @@ import Button from 'src/components/Button/Button';
 import { SaveAsRounded } from '@mui/icons-material';
 import { usePost } from 'src/hooks/useRequest';
 import MapComponent from './Map';
-import { InputLabel } from '@mui/material';
+import { InputLabel, useMediaQuery } from '@mui/material';
 import MarkdownEditor from 'src/components/MarkdownEditor/MarkdownEditor';
 
 const cloudName = 'dczhcauwf';
 const preset = 'lfueeeon';
 
-const brands = ['samsung', 'motorolla', 'xiomi', 'iphone', 'realme'];
+// const brands = ['samsung', 'motorolla', 'xiomi', 'iphone', 'realme'];
 
 const defaultPhoneForm = {
   // brand: 'samsung',
@@ -38,6 +38,8 @@ function PhoneDetails({ snackbarActions }) {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState('');
   const [content, setContent] = useState('');
+
+  const sm = useMediaQuery('(min-width:800px)');
 
   const { mutateAsync, isLoading } = usePost('phone/add/new-entry', ['phonesData']);
 
@@ -148,7 +150,7 @@ function PhoneDetails({ snackbarActions }) {
         PHONE DETAILS
       </Typography>
       {/* dialog and map form  start */}
-      <Stack direction={'row'} alignItems={'flex-start'} spacing={4}>
+      <Stack direction={`${sm ? 'row' : "column"}`} alignItems={'flex-start'} spacing={4}>
         <Box
           onSubmit={handleSubmit(onSubmit)}
           component={'form'}
@@ -216,6 +218,7 @@ function PhoneDetails({ snackbarActions }) {
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
+                  flexDirection: `${sm ? "row" : "column"}`,
                   width: '40%',
                   justifyContent: 'space-between',
                 }}
@@ -235,7 +238,7 @@ function PhoneDetails({ snackbarActions }) {
                   disabled={!images?.length}
                   variant={'outlined'}
                   onClickHandler={handleClearImages}
-                  sx={{ width: '45%', display: `${images?.length > 0 ? 'block' : 'none'}` }}
+                  sx={{ width: '45%', display: `${images?.length > 0 ? 'block' : 'none'}`,my:`${sm ? "0em" : ".5em"}`} }
                 >
                   Clear
                 </Button>
@@ -263,7 +266,7 @@ function PhoneDetails({ snackbarActions }) {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              width: '300px',
+              width: `${sm && "300px"}`,
               mx: 'auto',
             }}
           >

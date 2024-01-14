@@ -8,17 +8,17 @@ const { checkImei } = require('../utils/checkImei');
 const { phoneInfo } = require('../utils/phoneInfo');
 
 async function addNewPhoneEntry(req, res) {
-  const { imei, brand, model, content, address } = req.body;
+  const { imei, content, address } = req.body;
 
   if (!checkImei(imei)) {
     return errorResponse(res, 404, 'please provide valid IMEI Number');
   }
 
-  if ((!imei || !brand, !model || !address || !content)) {
+  if (!imei || !address || !content) {
     return errorResponse(res, 400, 'please provide field values');
   }
 
-  const { imeiCode, brandName, deviceName,modelName } = await phoneInfo(imei);
+  const { imeiCode, brandName, deviceName, modelName } = await phoneInfo(imei);
 
   const user = await User.findOne({ _id: req?.user?.userId });
 
@@ -32,7 +32,7 @@ async function addNewPhoneEntry(req, res) {
       ...req.body,
       imei: imeiCode,
       brand: brandName,
-      model: modelName ? modelName : deviceName ,
+      model: modelName ? modelName : deviceName,
       owner: {
         userId: user?._id,
         name: user?.userName,
@@ -117,6 +117,10 @@ async function getCommentsOfPhone(req, res) {
 async function showPhoneStatus(req, res) {
   const { imei } = req.body;
 
+  if (!checkImei(imei)) {
+    return errorResponse(res, 404, 'invalid IMEI');
+  }
+
   if (!imei.length) {
     return errorResponse(res, 404, 'please provide imei 15 digits of phone');
   }
@@ -125,7 +129,7 @@ async function showPhoneStatus(req, res) {
   const foundPhone = await Phone.findOne({ imei });
 
   if (!foundPhone) {
-    return errorResponse(res, 404, `incorrect imei or might not be registered in our site`);
+    return errorResponse(res, 404, `this IMEI is not registered in our site`);
   }
 
   //found the phone
@@ -145,6 +149,37 @@ async function getUserPhones(req, res) {
   return res.status(StatusCodes.OK).json({ phones: phonesOfUser });
 }
 
+const getPhoneStatusCounts = async (req, res) => {
+  try {
+    const result = await Phone.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const counts = {
+      stolen: 0,
+      recovered: 0,
+    };
+
+    result.forEach((item) => {
+      if (item._id === 'stolen') {
+        counts.stolen = item.count;
+      } else if (item._id === 'recovered') {
+        counts.recovered = item.count;
+      }
+    });
+
+    return res.status(200).json({ counts });
+  } catch (error) {
+    console.error('Error in aggregation:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   addNewPhoneEntry,
   getAllPhones,
@@ -153,4 +188,5 @@ module.exports = {
   deletePhone,
   updatePhone,
   showPhoneStatus,
+  getPhoneStatusCounts,
 };

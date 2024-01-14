@@ -9,6 +9,7 @@ import {
   IconButton,
   Badge,
   useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   CommentBank,
@@ -81,6 +82,7 @@ function CommentModel({
   phoneId,
   phoneModel,
   snackbarActions,
+  sm,
 }) {
   const {
     open: addCommentDialogOpen,
@@ -159,16 +161,22 @@ function CommentModel({
           </>
         ) : (
           <div>
-            <Typography component={'div'} variant={'h3'} sx={{ textAlign: 'center' }}>
+            <Typography
+              component={'div'}
+              variant={`${sm ? 'h3' : 'h6'}`}
+              sx={{ textAlign: 'center' }}
+            >
               No comments for this phone
             </Typography>
-            <Button
-              variant={'contained'}
-              type={'button'}
-              onClickHandler={handleAddCommentDialogOpen}
-            >
-              Add A Comment
-            </Button>
+            <Box sx={{ my: `${sm ? '0em' : '2em'}` }}>
+              <Button
+                variant={'contained'}
+                type={'button'}
+                onClickHandler={handleAddCommentDialogOpen}
+              >
+                Add A Comment
+              </Button>
+            </Box>
           </div>
         )}
       </MuiDialog>
@@ -336,7 +344,7 @@ function AddCommentModal({ open, handleOpen, handleClose, phoneModel, phoneId, s
   );
 }
 
-function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActions }) {
+function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActions, sm }) {
   const [content, setContent] = useState(phoneToUpdate?.content || '');
 
   const { mutateAsync } = usePut(`phone/updatephone?phoneId=${phoneToUpdate?._id}`, ['phonesData']);
@@ -387,7 +395,7 @@ function EditDialog({ open, handleOpen, handleClose, phoneToUpdate, snackbarActi
     <>
       <MuiDialog open={open} handleOpen={handleOpen} handleClose={handleClose}>
         <Box component={'form'} onSubmit={handleEditSubmit(onSubmit)}>
-          <Box sx={{ my: '1em', p: '1em' }}>
+          <Box sx={{ my: '1em', p: sm ? '1em' : '0em' }}>
             <MarkdownEditor
               content={content}
               setContent={setContent}
@@ -428,6 +436,8 @@ function PhoneCard({ phone }) {
 
   const theme = useTheme();
 
+  const sm = useMediaQuery('(min-width:800px)');
+
   const {
     handleClose: handleConfirmDialogClose,
     handleOpen: handleConfirmDialogOpen,
@@ -466,6 +476,7 @@ function PhoneCard({ phone }) {
         handleClose={handleEditDailogClose}
         phoneToUpdate={phone}
         snackbarActions={snackbarActions}
+        sm={sm}
       />
 
       <Card sx={{ width: '100%', p: '1em', my: '2em' }}>
@@ -514,19 +525,21 @@ function PhoneCard({ phone }) {
             </Box>
           )}
         </Stack>
-        {phone?.images?.length > 0 && <Box sx={{ my: '1em', width: '100%' }}>
-          <Slider {...settings}>
-            {phone?.images?.map((img, idx) => (
-              <div key={idx}>
-                <img
-                  style={{ width: '100%', height: '400px', objectFit: 'cover' }}
-                  src={img}
-                  alt="image"
-                />
-              </div>
-            ))}
-          </Slider>
-        </Box>}
+        {phone?.images?.length > 0 && (
+          <Box sx={{ my: '1em', width: '100%' }}>
+            <Slider {...settings}>
+              {phone?.images?.map((img, idx) => (
+                <div key={idx}>
+                  <img
+                    style={{ width: '100%', height: '400px', objectFit: 'cover' }}
+                    src={img}
+                    alt="image"
+                  />
+                </div>
+              ))}
+            </Slider>
+          </Box>
+        )}
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <ToolTip title={'comments'}>
@@ -544,6 +557,7 @@ function PhoneCard({ phone }) {
           snackbarActions={snackbarActions}
           phoneId={phone?._id}
           phoneModel={phone?.model}
+          sm={sm}
         />
         <Typography
           component={'div'}
@@ -558,6 +572,7 @@ function PhoneCard({ phone }) {
             display: 'flex',
             alignItems: 'center',
             fontSize: '.8rem',
+            flexDirection: sm ? 'row' : 'column',
             justifyContent: 'space-between',
             my: '1em',
           }}

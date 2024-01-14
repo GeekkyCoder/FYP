@@ -2,10 +2,13 @@ const User = require('../modals/user.modal');
 const { StatusCodes } = require('http-status-codes');
 const { errorResponse } = require('../utils/errResponse');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const attachCookiesToResponse = require('../utils/attachCookiesToResponse');
 const checkPermission = require('../middlewares/check-auth');
 const sendVerificationEmail = require('../utils/sendVerificationEmail');
 const sendEmail = require('../utils/sendEmail');
+const { sendResetPasswordEmail } = require('../utils/sendResetPasswordEmail');
+const { createHash } = require('../utils/createHash');
 
 const register = async (req, res) => {
   const { userName, email, password, confirmPassword, profilePicture } = req.body;
@@ -40,7 +43,7 @@ const register = async (req, res) => {
     email: user?.email,
   };
 
-  // let origin = "http://localhost:5173"
+  // let origin = 'http://localhost:5173';
   let origin = 'https://fyp-theta-seven.vercel.app';
 
   await sendVerificationEmail({
@@ -215,6 +218,79 @@ const getUserFeedBack = async (req, res) => {
   return res.status(200).json({ msg: `thanks for your feedback, ${user?.userName}` });
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return errorResponse(res, 404, 'please provide email!!');
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return errorResponse(
+      res,
+      401,
+      'please provide the email, that you have registered with our site!!!'
+    );
+  }
+
+  const passwordToken = crypto.randomBytes(70).toString('hex');
+
+  const tenMinutes = 1000 * 60 * 10;
+
+  const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes);
+
+  // const origin = 'http://localhost:5173/user/reset-password';
+  let origin = 'https://fyp-theta-seven.vercel.app/user/reset-password';
+
+  //send email
+  await sendResetPasswordEmail({
+    name: user.userName,
+    email: user.email,
+    token: passwordToken,
+    origin,
+  });
+
+  user.passwordToken = createHash(passwordToken);
+  user.passwordTokenExpirationDate = passwordTokenExpirationDate;
+
+  await user.save();
+
+  return res.status(200).json({ msg: 'check your email for reset password link' });
+};
+
+const resetPassword = async (req, res) => {
+  const { token, email, password } = req.body;
+
+  if (!token || !email || !password) {
+    return errorResponse(res, 404, 'please provide all values');
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return errorResponse(res, 401, 'please proivide that is registered with this site');
+  }
+
+  const currentDate = new Date();
+
+  if (user.passwordToken === createHash(token) && user.passwordTokenExpirationDate > currentDate) {
+    user.password = password;
+    user.passwordToken = null;
+    user.passwordTokenExpirationDate = null;
+    await user.save();
+  }
+
+  return res.status(200).json({ msg: 'password updated successfully' });
+};
+
+const getTotalUsersLength = async (req, res) => {
+  const usersLength = (await User.find({ isVerified: true })).length;
+
+  return res.status(200).json({ users: usersLength });
+};
+
 module.exports = {
   register,
   login,
@@ -225,4 +301,7 @@ module.exports = {
   deleteUser,
   verifyEmail,
   getUserFeedBack,
+  forgotPassword,
+  resetPassword,
+  getTotalUsersLength,
 };

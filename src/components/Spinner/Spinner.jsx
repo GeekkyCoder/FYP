@@ -1,5 +1,8 @@
+import CircularProgress from "@mui/material/CircularProgress";
+
+
 function Spinner() {
-  return <div>Loading...</div>;
+  return <><CircularProgress variant="indeterminate" /></>;
 }
 
 export default Spinner;

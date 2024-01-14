@@ -3,7 +3,7 @@ import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import DashboardLayout from '../layouts/dashboard';
 import useProtectedRoute from './hooks/use-protected-route';
-
+import Spinner from 'src/components/Spinner/Spinner';
 
 export const LandingPage = lazy(() => import('../pages/landing'));
 export const IndexPage = lazy(() => import('../pages/app'));
@@ -13,7 +13,8 @@ export const LoginPage = lazy(() => import('../pages/login'));
 export const PhonePage = lazy(() => import('../pages/phone'));
 export const ProductsPage = lazy(() => import('../pages/products'));
 export const Page404 = lazy(() => import('../pages/page-not-found'));
-const VerifyEmail = lazy(() => import("src/pages/verify-email")) 
+const VerifyEmail = lazy(() => import('src/pages/verify-email'));
+const ResetPassword = lazy(() => import('src/pages/reset-password'));
 
 // ----------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ export default function Router() {
     {
       element: (
         <DashboardLayout>
-          <Suspense fallback={'loading'}>
+          <Suspense fallback={<Spinner />}>
             <Outlet />
           </Suspense>
         </DashboardLayout>
@@ -40,6 +41,10 @@ export default function Router() {
     {
       path: 'user/verify-email',
       element: <VerifyEmail />,
+    },
+    {
+      path: 'user/reset-password',
+      element: <ResetPassword />,
     },
     {
       path: 'products',

@@ -8,6 +8,7 @@ const {
   updatePhone,
   showPhoneStatus,
   getUserPhones,
+  getPhoneStatusCounts,
 } = require('../controllers/phone');
 
 const phoneRouter = require('express').Router();
@@ -19,6 +20,7 @@ phoneRouter.delete('/deletephone', [authMiddleware, authorize('admin', 'user')],
 phoneRouter.put('/updatephone', [authMiddleware, authorize('admin', 'user')], updatePhone);
 phoneRouter.post('/showphonestatus', [authMiddleware, authorize('admin', 'user')], showPhoneStatus);
 phoneRouter.get('/user-phones', [authMiddleware, authorize('admin', 'user')], getUserPhones);
+phoneRouter.get("/phone-stats", getPhoneStatusCounts )
 
 module.exports = {
   phoneRouter,

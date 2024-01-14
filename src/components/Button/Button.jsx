@@ -1,4 +1,5 @@
 import LoadingButton from "@mui/lab/LoadingButton";
+import { useMediaQuery } from "@mui/material";
 
 const Button = ({
   type,
@@ -12,11 +13,14 @@ const Button = ({
   loading,
   icon,
 }) => {
+
+  const sm = useMediaQuery('(min-width:800px)');
+
   return (
     <>
       {type === "button" ? (
         <LoadingButton
-        size="large"
+         size= {`${sm} ? "large" : "small"`}
           startIcon={icon}
           disabled={disabled}
           type={type}
@@ -31,7 +35,7 @@ const Button = ({
         </LoadingButton>
       ) : (
         <LoadingButton
-          size="large"
+        size= {`${sm} ? "large" : "small"`}
           startIcon={icon}
           type={type}
           variant={variant}
