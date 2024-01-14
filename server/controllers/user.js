@@ -41,7 +41,7 @@ const register = async (req, res) => {
   };
 
   // let origin = "http://localhost:5173"
-  let origin = "https://fyp-theta-seven.vercel.app"
+  let origin = 'https://fyp-theta-seven.vercel.app';
 
   await sendVerificationEmail({
     name: userFound.userName,
@@ -120,7 +120,7 @@ const logOut = async (req, res) => {
   res.cookie('token', 'logout', {
     httpOnly: true,
     expires: new Date(Date.now()),
-    sameSite:"none"
+    sameSite: 'none',
   });
 
   res.status(200).json('logged out successfully!');
@@ -154,7 +154,7 @@ const updateUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({isVerified:true}).select('-password');
+    const users = await User.find({ isVerified: true }).select('-password');
     res.status(StatusCodes.OK).json({ users });
   } catch (err) {
     res.status(500).json({ msg: 'failed to fetch users' });
@@ -189,10 +189,10 @@ const deleteUser = async (req, res) => {
 const getUserFeedBack = async (req, res) => {
   const { Email, Message } = req.body;
 
-  const user = await User.findOne({email:Email})
+  const user = await User.findOne({ email: Email });
 
-  if(!user) {
-    return errorResponse(res,404,"please create your account first")
+  if (!user) {
+    return errorResponse(res, 404, 'please create your account first');
   }
 
   if (!Email.length || !Message.length) {
@@ -205,9 +205,14 @@ const getUserFeedBack = async (req, res) => {
    <p>${Message}</p>
  </div>`;
 
-  await sendEmail(
-    { html: message, subject: 'Feedback from user', to: 'farazahmedk955@gmail.com',from:{email:user?.email,hasComment:false} }
-  );
+  await sendEmail({
+    html: message,
+    subject: 'Feedback from user',
+    to: 'farazahmedk955@gmail.com',
+    from: { email: user?.email, hasComment: false },
+  });
+
+  return res.status(200).json({ msg: `thanks for your feedback, ${user?.userName}` });
 };
 
 module.exports = {
@@ -219,5 +224,5 @@ module.exports = {
   getAllUsers,
   deleteUser,
   verifyEmail,
-  getUserFeedBack
+  getUserFeedBack,
 };
