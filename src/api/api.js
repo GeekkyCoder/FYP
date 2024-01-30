@@ -1,6 +1,6 @@
-const BASE_URL = 'http://localhost:8000';
+//const BASE_URL = 'http://localhost:8000';
 
-///const BASE_URL = 'https://phone-tracker-flame.vercel.app';
+const BASE_URL = 'https://phone-tracker-flame.vercel.app';
 
 import axios from 'axios';
 
