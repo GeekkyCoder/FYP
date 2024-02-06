@@ -57,11 +57,12 @@ export function overrides(theme) {
         },
       },
     },
+    
     MuiButton: {
       styleOverrides: {
         containedInherit: {
-          color: theme.palette.common.white,
-          backgroundColor: theme.palette.grey[800],
+          // color: theme.palette.common.white,
+          backgroundColor: theme.palette.primary.main,
           '&:hover': {
             color: theme.palette.common.white,
             backgroundColor: theme.palette.grey[800],

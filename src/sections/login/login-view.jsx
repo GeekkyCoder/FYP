@@ -142,7 +142,7 @@ export default function LoginView() {
       await postRequest('user/auth/register', payload);
       signupReset();
       setIsLoading(false);
-      snackbarActions('registered successfully', 'success', true);
+      snackbarActions('registered successfully,please check your email inbox', 'success', true);
     } catch (err) {
       snackbarActions(err?.message, 'error', true);
       setIsLoading(false);

@@ -1,10 +1,13 @@
 import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
+
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
 import AppWidgetSummary from '../app-widget-summary';
 import useAuth from 'src/hooks/useAuth';
 import { useGet } from 'src/hooks/useRequest';
+import MuiTable from 'src/components/Table/Table';
 
 // ----------------------------------------------------------------------
 
@@ -17,9 +20,13 @@ export default function AppView() {
     error: phoneStatError,
   } = useGet('phone/phone-stats', 'phone-stats');
 
-  const {data:totalUser,isLoading:totalUserLoading,error:totalUserError} = useGet("user/total-users",'totalUsers')
+  const {
+    data: totalUser,
+    isLoading: totalUserLoading,
+    error: totalUserError,
+  } = useGet('user/total-users', 'totalUsers');
 
-  console.log(totalUser)
+  console.log(totalUser);
 
   return (
     <Container maxWidth="xl">
@@ -55,6 +62,9 @@ export default function AppView() {
           />
         </Grid>
       </Grid>
+     {user?.role.includes("admin") && <Box sx={{ my: '1em',mt:"3em" }}> 
+        <MuiTable />
+       </Box> }
     </Container>
   );
 }

@@ -13,6 +13,7 @@ export const LoginPage = lazy(() => import('../pages/login'));
 export const PhonePage = lazy(() => import('../pages/phone'));
 export const ProductsPage = lazy(() => import('../pages/products'));
 export const Page404 = lazy(() => import('../pages/page-not-found'));
+export const PhoneViewPost = lazy(() => import('../pages/phone-view-post'));
 const VerifyEmail = lazy(() => import('src/pages/verify-email'));
 const ResetPassword = lazy(() => import('src/pages/reset-password'));
 
@@ -37,6 +38,10 @@ export default function Router() {
         { path: 'blog', element: <ProtectedRoute element={<BlogPage />} /> },
         { path: 'phone', element: <ProtectedRoute element={<PhonePage />} /> },
       ],
+    },
+    {
+      path: 'post/:phoneId',
+      element: <PhoneViewPost />,
     },
     {
       path: 'user/verify-email',

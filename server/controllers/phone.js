@@ -6,9 +6,10 @@ const User = require('../modals/user.modal');
 const checkPermission = require('../middlewares/check-auth');
 const { checkImei } = require('../utils/checkImei');
 const { phoneInfo } = require('../utils/phoneInfo');
+const sendEmail = require('../utils/sendEmail');
 
 async function addNewPhoneEntry(req, res) {
-  const { imei, content, address } = req.body;
+  const { imei, content, address, nicPictures } = req.body;
 
   if (!checkImei(imei)) {
     return errorResponse(res, 404, 'please provide valid IMEI Number');
@@ -33,6 +34,7 @@ async function addNewPhoneEntry(req, res) {
       imei: imeiCode,
       brand: brandName,
       model: modelName ? modelName : deviceName,
+      nicPictures,
       owner: {
         userId: user?._id,
         name: user?.userName,
@@ -42,12 +44,34 @@ async function addNewPhoneEntry(req, res) {
       },
     });
 
+    const html = ` <div class="container">
+    <h2>Phone Verification</h2>
+    <p>Hello Admin,</p>
+    <p>Please verify the post by clicking the link below:</p>
+    <p><a href="https://fyp-theta-seven.vercel.app/post/${phone._id}?name=${phone.model}" style="display: inline-block; padding: 10px 20px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 3px;">Verify Post</a></p>
+    <p>Thank you!</p>
+</div>`;
+
+    await sendEmail({
+      to: 'farazahmedk955@gmail.com',
+      subject: 'Verify the post',
+      html,
+      from: user.email,
+    });
+
     return res
       .status(StatusCodes.CREATED)
       .json({ msg: `mobile with IMEI:${phone?.imei} registered!!` });
   } catch (err) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: err?.message });
   }
+}
+
+async function getAllVerifiedPhones(req, res) {
+  const phones = await Phone.find({
+    verified: true,
+  });
+  return res.status(StatusCodes.OK).json({ phones });
 }
 
 async function getAllPhones(req, res) {
@@ -180,13 +204,77 @@ const getPhoneStatusCounts = async (req, res) => {
   }
 };
 
+const getPhone = async (req, res) => {
+  const { phoneId } = req.query;
+
+  const phone = await Phone.findOne({ _id: phoneId });
+
+  if (!phone) {
+    return errorResponse(res, 404, 'phone not found');
+  }
+
+  const phoneObj = {
+    id: phone?._id,
+    userName: phone?.owner.name,
+    model: phone?.model,
+    date: phone?.dateRegistered,
+    status: phone?.verified,
+    link: `http://localhost:5173/post/${phone?._id}?name=${phone?.model}`,
+    nicPictures: phone.nicPictures,
+    images: phone.images,
+  };
+
+  return res.status(200).json({ phone: phoneObj });
+};
+
+const verifyPhone = async (req, res) => {
+  const { phoneId } = req.body;
+
+  const phone = await Phone.findOne({ _id: phoneId });
+
+  if (!phone) {
+    return errorResponse(res, 404, 'phone not found');
+  }
+
+  if (phone.verified) {
+    return errorResponse(res, 404, 'phone already verified');
+  }
+
+  await Phone.findOneAndUpdate({ _id: phone._id }, { verified: true }, { upsert: true });
+
+  res.status(200).json({ msg: 'phone verified successfully' });
+};
+
+const sendEmailForRequest = async (req, res) => {
+  const { userEmail, content } = req.body;
+
+  const user = await User.findOne({ email: userEmail });
+
+  if (!user) {
+    return errorResponse(res, 404, 'user does not exist');
+  }
+
+  await sendEmail({
+    to: userEmail,
+    subject: 'queries',
+    html: content,
+    from: 'farazahmedk955@gmail.com',
+  });
+
+  return res.status(200).json({ msg: 'email sent successfully' });
+};
+
 module.exports = {
   addNewPhoneEntry,
   getAllPhones,
   getUserPhones,
   getCommentsOfPhone,
+  sendEmailForRequest,
   deletePhone,
   updatePhone,
   showPhoneStatus,
   getPhoneStatusCounts,
+  getAllVerifiedPhones,
+  getPhone,
+  verifyPhone,
 };

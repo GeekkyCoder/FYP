@@ -9,12 +9,20 @@ const {
   showPhoneStatus,
   getUserPhones,
   getPhoneStatusCounts,
+  getPhone,
+  getAllVerifiedPhones,
+  verifyPhone,
+  sendEmailForRequest,
 } = require('../controllers/phone');
 
 const phoneRouter = require('express').Router();
 
 phoneRouter.post('/add/new-entry', authMiddleware, addNewPhoneEntry);
-phoneRouter.get('/getallphones', getAllPhones);
+phoneRouter.get('/getallphonesverified', getAllVerifiedPhones);
+phoneRouter.get('/getPhone', [authMiddleware,authorize('admin')],getPhone );
+phoneRouter.post("/sendEmailForQueries",[authMiddleware,authorize("admin")], sendEmailForRequest)
+phoneRouter.post("/verify-phone",[authMiddleware,authorize('admin')], verifyPhone)
+phoneRouter.get("/getallphones", [authMiddleware,authorize('admin')], getAllPhones)
 phoneRouter.get('/getcomments', authMiddleware, getCommentsOfPhone);
 phoneRouter.delete('/deletephone', [authMiddleware, authorize('admin', 'user')], deletePhone);
 phoneRouter.put('/updatephone', [authMiddleware, authorize('admin', 'user')], updatePhone);

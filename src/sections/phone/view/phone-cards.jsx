@@ -8,7 +8,7 @@ function PhoneCards() {
     data: phonesData,
     isLoading: phonesloading,
     error: phonesError,
-  } = useGet('phone/getallphones', 'phonesData');
+  } = useGet('phone/getallphonesverified', 'phonesData');
 
   if (phonesError) {
     return <div>Could not fetch phones...</div>;

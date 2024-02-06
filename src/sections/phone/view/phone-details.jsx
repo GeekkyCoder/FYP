@@ -14,6 +14,8 @@ import { usePost } from 'src/hooks/useRequest';
 import MapComponent from './Map';
 import { InputLabel, useMediaQuery } from '@mui/material';
 import MarkdownEditor from 'src/components/MarkdownEditor/MarkdownEditor';
+import DropZone from 'src/components/DropZone/DropZone';
+import useCloudinary from 'src/hooks/use-cloudinary';
 
 const cloudName = 'dczhcauwf';
 const preset = 'lfueeeon';
@@ -38,10 +40,13 @@ function PhoneDetails({ snackbarActions }) {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState('');
   const [content, setContent] = useState('');
+  const [files, setFiles] = useState([]);
 
   const sm = useMediaQuery('(min-width:800px)');
 
   const { mutateAsync, isLoading } = usePost('phone/add/new-entry', ['phonesData']);
+
+  const { uploadImageToCloudinary } = useCloudinary();
 
   const {
     control,
@@ -111,6 +116,25 @@ function PhoneDetails({ snackbarActions }) {
   };
 
   const onSubmit = async (data) => {
+    if (images.length < 2) {
+      snackbarActions('please provide 2 images of phone box', 'error', true);
+      return;
+    }
+
+    if (files.length < 2) {
+      snackbarActions('please provide front and back of your NIC', 'error', true);
+      return;
+    }
+
+    let nicPictures = [];
+
+    setLoading(true);
+
+    const url1 = await uploadImageToCloudinary(files[0]?.file);
+    const url2 = await uploadImageToCloudinary(files[1]?.file);
+
+    nicPictures.push(url1, url2);
+
     if (!address?.length) {
       snackbarActions('address field is required', 'error', true);
       return;
@@ -124,6 +148,7 @@ function PhoneDetails({ snackbarActions }) {
       ...data,
       address,
       content,
+      nicPictures,
       images: imageUrls,
     };
 
@@ -135,8 +160,11 @@ function PhoneDetails({ snackbarActions }) {
       setImageUrls([]);
       setAddress('');
       setContent('');
+      setFiles([]);
+      setLoading(false);
     } catch (err) {
       snackbarActions(err?.message, 'error', true);
+      setLoading(false);
     }
   };
 
@@ -150,7 +178,7 @@ function PhoneDetails({ snackbarActions }) {
         PHONE DETAILS
       </Typography>
       {/* dialog and map form  start */}
-      <Stack direction={`${sm ? 'row' : "column"}`} alignItems={'flex-start'} spacing={4}>
+      <Stack direction={`${sm ? 'row' : 'column'}`} alignItems={'flex-start'} spacing={4}>
         <Box
           onSubmit={handleSubmit(onSubmit)}
           component={'form'}
@@ -165,20 +193,13 @@ function PhoneDetails({ snackbarActions }) {
             width: '100%',
           }}
         >
-          {/* <Box>
-            <SelectComp control={control} name={'brand'} menuItems={brands} label={'Brand'} />
-          </Box> */}
-          {/* <ControlInput
-            control={control}
-            mulitine={true}
-            type={'text'}
-            name={'model'}
-            helperText={
-              touchedFields?.modal && errors?.modal ? errors?.modal?.message : 'e.g Galaxy S9'
-            }
-            error={touchedFields?.modal && !!errors?.modal}
-            fullWidth={true}
-          /> */}
+          <Box sx={{ gridColumn: '1/-1' }}>
+            <Typography component={'div'} variant={'body2'} sx={{ fontWeight: 'bold' }}>
+              Upload Front And Back Of NIC
+            </Typography>
+            <DropZone files={files} setFiles={setFiles} />
+          </Box>
+
           <Box sx={{ gridColumn: '1/-1' }}>
             <ControlInput
               control={control}
@@ -218,7 +239,7 @@ function PhoneDetails({ snackbarActions }) {
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  flexDirection: `${sm ? "row" : "column"}`,
+                  flexDirection: `${sm ? 'row' : 'column'}`,
                   width: '40%',
                   justifyContent: 'space-between',
                 }}
@@ -238,7 +259,11 @@ function PhoneDetails({ snackbarActions }) {
                   disabled={!images?.length}
                   variant={'outlined'}
                   onClickHandler={handleClearImages}
-                  sx={{ width: '45%', display: `${images?.length > 0 ? 'block' : 'none'}`,my:`${sm ? "0em" : ".5em"}`} }
+                  sx={{
+                    width: '45%',
+                    display: `${images?.length > 0 ? 'block' : 'none'}`,
+                    my: `${sm ? '0em' : '.5em'}`,
+                  }}
                 >
                   Clear
                 </Button>
@@ -266,7 +291,7 @@ function PhoneDetails({ snackbarActions }) {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              width: `${sm && "300px"}`,
+              width: `${sm && '300px'}`,
               mx: 'auto',
             }}
           >

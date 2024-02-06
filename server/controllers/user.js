@@ -43,8 +43,8 @@ const register = async (req, res) => {
     email: user?.email,
   };
 
-  // let origin = 'http://localhost:5173';
   let origin = 'https://fyp-theta-seven.vercel.app';
+  // let origin = 'https://fyp-theta-seven.vercel.app';
 
   await sendVerificationEmail({
     name: userFound.userName,
@@ -241,8 +241,8 @@ const forgotPassword = async (req, res) => {
 
   const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes);
 
-  // const origin = 'http://localhost:5173/user/reset-password';
-  let origin = 'https://fyp-theta-seven.vercel.app/user/reset-password';
+  const origin = 'https://fyp-theta-seven.vercel.app/user/reset-password';
+  // let origin = 'https://fyp-theta-seven.vercel.app/user/reset-password';
 
   //send email
   await sendResetPasswordEmail({
