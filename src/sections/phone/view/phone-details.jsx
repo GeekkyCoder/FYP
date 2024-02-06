@@ -154,7 +154,7 @@ function PhoneDetails({ snackbarActions }) {
 
     try {
       await mutateAsync(payload);
-      snackbarActions('uploaded', 'success', true);
+      snackbarActions('your post will be verified by admin, please wait...', 'success', true);
       reset();
       setImages([]);
       setImageUrls([]);

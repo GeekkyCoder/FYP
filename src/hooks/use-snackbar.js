@@ -30,7 +30,7 @@ const useSnackbar = () => {
     handleAlertSeverity(severity);
     setTimeout(() => {
       handleSnackbarClose();
-    }, 5000);
+    }, 10000);
   };
 
   return {
