@@ -31,8 +31,8 @@ import ForgotPassword from 'src/pages/forgot-password';
 // ----------------------------------------------------------------------
 
 const defaultLoginFormData = {
-  Email: '',
-  Password: '',
+  Email: 'farazahmedk955@gmail.com',
+  Password: 'secret12',
 };
 
 const schema = yup.object().shape({
